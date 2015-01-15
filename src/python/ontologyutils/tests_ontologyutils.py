@@ -1,4 +1,5 @@
 import sys
+import os
 import pytest
 sys.path.append('./ontologyutils')
 import ontologyutils as onto
