@@ -3,9 +3,7 @@ import pytest
 sys.path.append('./ontologyutils')
 import ontologyutils as onto
 
-#oboFile = open('C:\Users\gk680303\Documents\ontologies\hp.obo','r')
-
-filename = './samples/hpo.obo'
+filename = '../samples/hpo.obo'
 hpo = onto.Ontology.fromOBOFile(filename)
 
 def test_hpoterm_exists():
