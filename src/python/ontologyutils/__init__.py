@@ -5,6 +5,7 @@ class Ontology(object):
     #keys are the term ids
     self.terms = {}
     self.dbxrefs = {}
+    self.altids = {}
     self.oboNamespace = 'http://purl.obolibrary.org/obo/'
     self.ordoNamespace = 'http://www.orpha.net/ORDO/'
     
@@ -27,7 +28,7 @@ class Ontology(object):
             m = re.match("([^\"]+)\".*", value)
             if m:
                 v = m.groups()[0]
-                print "{0}\n".format(v.rstrip())
+                #print "{0}\n".format(v.rstrip())
                 value = v.rstrip()
             
         if not data.has_key(tag):
@@ -55,7 +56,7 @@ class Ontology(object):
         #only add to the structure if the term has a is_a tag
         #the is_a value contain GOID and term definition
         #we only want the GOID
-        if term.has_key('is_a'):         
+        if term.has_key('is_a'):
           termParents = [p.split()[0] for p in term['is_a']]
 
           if not self.terms.has_key(termID):
@@ -64,11 +65,15 @@ class Ontology(object):
             # reverse dictionnary from xref to term
             if 'hasDbXref' in term:
                 for xref in term['hasDbXref']:
-                    print " add xref [{0}] ==> {1}\n".format(xref, termID)
+                    #print " add xref [{0}] ==> {1}\n".format(xref, termID)
                     if not xref in self.dbxrefs:
                         self.dbxrefs[xref] = []
                     self.dbxrefs[xref].append(termID)
-
+            if 'alt_id' in term:
+              for alt_id in term['alt_id']:
+                self.altids[alt_id] = termID
+          elif not 'tags' in self.terms[termID]:
+            self.terms[termID]['tags'] = term
           #append parents of the current term
           self.terms[termID]['p'] = termParents
 
@@ -92,6 +97,8 @@ class Ontology(object):
     #print "{0}\n".format()
     if (id in self.terms):
         result = self.terms[id]
+    elif (id in self.altids):
+        result = self.terms[self.altids[id]]
     return result
     
   def getDescendents(self, goid):
