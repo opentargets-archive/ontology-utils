@@ -19,6 +19,8 @@ class Ontology(object):
     for line in term:
         tag = line.split(': ',1)[0]
         value = line.split(': ',1)[1]
+        if re.match("!", value):
+            value = value.split("!")[0]
         #print tag + " => " + value + "\n"
         if tag == 'xref':
             tag = 'hasDbXref'
@@ -53,7 +55,7 @@ class Ontology(object):
         #only add to the structure if the term has a is_a tag
         #the is_a value contain GOID and term definition
         #we only want the GOID
-        if term.has_key('is_a'):
+        if term.has_key('is_a'):         
           termParents = [p.split()[0] for p in term['is_a']]
 
           if not self.terms.has_key(termID):
@@ -83,6 +85,13 @@ class Ontology(object):
     #print "{0}\n".format()
     if (xref in self.dbxrefs):
         result = self.dbxrefs[xref]
+    return result
+    
+  def getTermById(self, id):
+    result = None
+    #print "{0}\n".format()
+    if (id in self.terms):
+        result = self.terms[id]
     return result
     
   def getDescendents(self, goid):
