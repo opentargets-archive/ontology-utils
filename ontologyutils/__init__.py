@@ -1,4 +1,5 @@
 import re
+
 class Ontology(object):
     def __init__(self):
 
