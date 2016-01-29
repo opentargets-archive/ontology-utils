@@ -33,5 +33,6 @@ class Config():
         negativePhenotype = '%s/negative_phenotype_annotation.tab'%HPO_ANNOTATIONS_DIRECTORY,
         rare_phenotype_annotation = '%s/phenotype_annotation.tab'%HPO_ANNOTATIONS_DIRECTORY,
         phenotypeAnnotationHPOTeam = '%s/phenotype_annotation_hpoteam.tab'%HPO_ANNOTATIONS_DIRECTORY,
-        common_phenotype_annotation = '%s/hp_common_annotations_all.tab'%HPO_ANNOTATIONS_DIRECTORY
+        common_phenotype_annotation = '%s/hp_common_annotations_all.tab'%HPO_ANNOTATIONS_DIRECTORY,
+        ic_backup = '%s/backup.json'%CACHE_DIRECTORY
     )
