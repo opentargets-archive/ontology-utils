@@ -4,23 +4,21 @@ import time
 import json
 import re
 import sys
+reload(sys);
+sys.setdefaultencoding("utf8");
 import datetime
 import optparse
 import logging
 import hashlib
 import ontologyutils as onto
+from ontologyutils.similarity import OntologyLookup, PhenotypeLookup, Diseases
 import numpy
 import math
+import operator
+from functools import partial
 from settings import Config
 
 hpo = None
-hpo_alt_ids = {}
-nb_diseases = 0
-rare_diseases = {}
-common_diseases = {}
-diseaseLookup = {}
-phenotypeLookup = {}
-doidLookup = {}
 ICs = {}
 ancestors = {}
 micas = {}
@@ -30,30 +28,79 @@ def main():
     parser.add_option('-p', '--hpo', type='string', default=Config.HPO_FILES['obo'], dest='hpoFilename')
     parser.add_option('-r', '--rd', type='string', default=Config.HPO_FILES['rare_phenotype_annotation'], dest='rdFilename')
     parser.add_option('-c', '--cd', type='string', default=Config.HPO_FILES['common_phenotype_annotation'], dest='cdFilename')
-    parser.add_option('-b', '--backup', type='string', default=Config.HPO_FILES['ic_backup'], dest='backupFilename')
+    #parser.add_option('-b', '--backup', type='string', default=Config.HPO_FILES['ic_backup'], dest='backupFilename')
+    parser.add_option('-s', '--rdset', type='string', default='OMIM', dest='rdset')
+
     options, args = parser.parse_args()
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
-    loadHPO(options.hpoFilename);
-    #loadRareDiseases(options.rdFilename)
-    #loadCommonDiseases(options.cdFilename)
-    #computeICs()
-    #writeBackup(options.backupFilename)
-    #sys.exit(1);
+    logging.info("Load HP")
+    phenotypeLookup = PhenotypeLookup(options.hpoFilename)
+    diseases = Diseases(phenotypeLookup)
 
-    readBackup(options.backupFilename);
+    bRecompute = False
+
+    if (bRecompute):
+        logging.info("Load Rare disease annotations")
+        diseases.load_rare_diseases(options.rdFilename)
+        logging.info("Load MeSH disease annotations")
+        diseases.load_mesh_diseases(options.cdFilename)
+        diseases.compute_ICs()
+        diseases.compute_MICAs()
+        diseases.write_backup(Config.SIM_DISEASES_BACKUP, Config.SIM_MICAS_BACKUP)
+        #sys.exit(1)
+    else:
+        diseases.read_backup(Config.SIM_DISEASES_BACKUP, Config.SIM_MICAS_BACKUP)
+
+        print diseases.MICAs[0,0]
+        print diseases.MICAs[500, 600]
+        print diseases.MICAs
+
+        indexA = 0
+        for diseaseA in diseases.disease_lookup:
+            #print diseaseA
+            indexB = 0
+            for diseaseB in diseases.disease_lookup:
+                if indexB > indexA:
+                    sim = diseases.compute_disease_similarity(diseaseA, diseaseB)
+                    if sim >= 1.5:
+                        print "%s\t%s\t%.4f"%(diseaseA, diseaseB, diseases.compute_disease_similarity(diseaseA, diseaseB))
+                indexB+=1
+            indexA +=1
+
+    #diseases.list_disease_phenotype('D010392')
+
+    # Now compute efficiency all the common ancestors level by level.
+    # Each level in the ontology is the common ancestor of all its children
+    # So we could build a data structure of common ancestors
+    #diseases.write_backup(options.backupFilename)
+
+    sys.exit(1)
+
     #extractDiseasePhenotype('OMIM:154700')
-    
-    getAllAncestors();
+
+    ''' get all HP term ancestors in one place '''
+    getAllAncestors()
     #computeAllMICA();
-    
-    extractDiseasePhenotype('D001159')
+
+    #printAllDiseaseNames('MeSH')
+    #sys.exit(0)
+
+    #extractDiseasePhenotype('D010392')
 
     #sys.exit(0)
-    
+
+    #getCD2RDSimilarity('D010392', "ORPHANET:2732", 'ORPHANET')
+    #"ORPHANET:2732" "ORPHANET:98849"
+    getCDs2RDs(options.rdset);
+
+    sys.exit(0)
+
+
     #print "Similarity %f"%(sim('OMIM:154700', 'OMIM:154700'))
     #print "Similarity Noonan Opitz %f"%(sim('OMIM:163950', 'OMIM:300000'))
     print "Similarity %f"%(sim('D001159', 'D046788'))
+
     # D002446 Celiac Disease 
     
     print "Similarity COPD %f"%(sim('D029424', 'OMIM:244400'))
@@ -85,7 +132,30 @@ def main():
     #getCD2RDs('D050197', 'ORPHANET', cutoff=2.5, limit =100)
     # OMIM:176670 progeria
     getRD2CDs('OMIM:176670', 'OMIM', cutoff=2, limit=50)
-    
+
+def getCDs2RDs(rdSet, cutoff=2):
+    global common_diseases
+    cdSet = 'MeSH'
+    for cd in common_diseases[cdSet]:
+        for rd in rare_diseases[rdSet]:
+                s = simPhenotypes(cd, rd)
+                score = s['sim']
+                d1d2 = s['d1d2']
+                d2d1 = s['d2d1']
+                #score = sim(cd, rd)
+                if score >= cutoff:
+                    print "\"%s\"\t\"%s\"\t\"%s\"\t\"%s\"\t\"%s\"\t\"%s\"\t\"%s\""%(cd, common_diseases['MeSH'][cd]['label'], rd, rare_diseases[rdSet][rd]['label'], score, micas2String(d1d2),micas2String(d2d1) );
+
+def getCD2RDSimilarity(cd, rd, rdSet):
+    global common_diseases
+    cdSet = 'MeSH'
+    s = simPhenotypes(cd, rd)
+    score = s['sim']
+    d1d2 = s['d1d2']
+    d2d1 = s['d2d1']
+    print "\"%s\"\t\"%s\"\t\"%s\"\t\"%s\"\t\"%s\"\t\"%s\"\t\"%s\""%(cd, common_diseases['MeSH'][cd]['label'], rd, rare_diseases[rdSet][rd]['label'], score, micas2String(d1d2),micas2String(d2d1) );
+
+
 def getCD2RDs(cd, rdSet, cutoff=2, limit=20):
     diseasePairs = {}
     topScore = []
@@ -153,16 +223,18 @@ def getTop20SimilarDiseases():
                         n+=1
                     if n > 20:
                         return;
-        
-def getAllAncestors():
-    global phenotypeLookup;
-    global ancestors;
-    for hpo_id in phenotypeLookup:
-        ancestors[hpo_id] = hpo.getAncestors(hpo_id);
 
 #def computeAllMICA():
     
-    
+
+def printAllDiseaseNames(diseaseSet):
+    if diseaseSet == 'OMIM' or diseaseSet == 'ORPHANET':
+        for disease_id in rare_diseases[diseaseSet]:
+            print rare_diseases[diseaseSet][disease_id]['label']
+    elif diseaseSet == 'MeSH':
+        for disease_id in common_diseases[diseaseSet]:
+            print common_diseases[diseaseSet][disease_id]['label']
+
 def writeBackup(backupFilename):
     global nb_diseases;
     global rare_diseases;
@@ -201,10 +273,7 @@ def readBackup(backupFilename):
         ICs = buffer['ICs']
     f_obj.close()
     
-def computeICs():
-    for phenotype in phenotypeLookup:
-        ICs[phenotype] = ic(phenotype)
-        
+
 def extractDiseasePhenotype(disease_id):
     record = diseaseLookup[disease_id]
     print record['label']
@@ -212,152 +281,15 @@ def extractDiseasePhenotype(disease_id):
         print "%s" %(hpo.terms[termId]['tags']['name'][0])
     print len(record['phenotypes'])
     
-def ic(hpo_id):
-    return -math.log(len(phenotypeLookup[hpo_id])/float(nb_diseases));
 
-def findMICA(s, t):
-    mica = None
-    if s == t or s in hpo.getAncestors(t):
-        return ic(s);
-    elif t in hpo.getAncestors(s):
-        return ICs[t]; #ic(t);
-    else:
-        # find the most informative common ancestor
-        l = [s, t]
-        l.sort()
-        key = "".join(l)
-        if key in micas:
-            return micas[key];
-        else:
-            #print "%s %s"%(t,s)
-            common_ancestors = set(ancestors[t].intersection(ancestors[s]))
-            #print "%s % s %s"%(s, t, ",".join(common_ancestors))
-            mica = max(map(lambda x: ICs[x], common_ancestors))
-            micas[key] = mica
-            return mica;
-    #return mica; 
-    
-def simDir(D1, D2):
-    P1 = diseaseLookup[D1]['phenotypes']
-    P2 = diseaseLookup[D2]['phenotypes']
-    set = []
-    for s in P1:
-        buffer = []
-        for t in P2:
-            buffer.append(findMICA(s, t))
-        set.append(max(buffer))
-    return numpy.mean(set)
 
-def sim(D1, D2):
-    return float(0.5)*simDir(D1, D2)+float(0.5)*simDir(D2, D1);
 
-def addDiseaseToPhenotype(disease_id, hpo_id):
-    global phenotypeLookup;
-    ancestors = hpo.getAncestors(hpo_id)
-    for ancestor in ancestors:
-        if ancestor not in phenotypeLookup:
-            phenotypeLookup[ancestor] = []
-        if disease_id not in phenotypeLookup[ancestor]:
-            phenotypeLookup[ancestor].append(disease_id)
-    
-def loadRareDiseases(rdFilename):
-    global rare_diseases;
-    global diseaseLookup;
-    global nb_diseases;
-    global hpo_alt_ids;
-    with open(rdFilename, "rb") as f_obj:
-        for line in f_obj:
-            A = line.rstrip("\n").split("\t")
-            #print A[0]
-            if A[0] not in rare_diseases:
-                rare_diseases[A[0]] = {}
-            db = rare_diseases[A[0]]
-            disease_name = A[2]
-            disease_id = A[0] + ":" + A[1]
-            hpo_id = A[4]
-            if hpo_id in hpo_alt_ids:
-                hpo_id = hpo_alt_ids[hpo_id]
-            if hpo_id in hpo.terms:
-                if 'is_obsolete' in hpo.terms[hpo_id]['tags'] and hpo.terms[hpo_id]['tags']['is_obsolete'][0] == 'true':
-                    if 'replaced_by' in hpo.terms[hpo_id]['tags']:
-                        hpo_id = hpo.terms[hpo_id]['tags']['replaced_by'][0]
-                    else:
-                        hpo_id = 'HP:0000001' # So it's general term with a very low IC
-            else:
-                hpo_id = 'HP:0000001' # So it's general term with a very low IC
-            #if A[4] == 'HP:0007852':
-            #    print hpo_id
-            #    sys.exit(1)
-            key = disease_id;
-            if key not in db:
-                nb_diseases +=1
-                db[key] = { 'phenotypes': [], 'id' : disease_id, 'label': disease_name }
-            db[key]['phenotypes'].append(hpo_id)
-            addDiseaseToPhenotype(disease_id, hpo_id)
-            #pointer
-            diseaseLookup[key] = db[key]
-            
-            #print hpo_id
-    f_obj.close()
-    print ",".join(rare_diseases.keys())
-
-def loadCommonDiseases(cdFilename):
-    global common_diseases;
-    global diseaseLookup;
-    global nb_diseases;
-    global hpo_alt_ids;
-    with open(cdFilename, "rb") as f_obj:
-        for line in f_obj:
-            A = line.rstrip("\n").split("\t")
-            if 'MeSH' not in common_diseases:
-                common_diseases['MeSH'] = {}
-            db = common_diseases['MeSH']
-            disease_name = A[1]
-            disease_id = A[0]
-            doid = A[2]
-            #disease_id = doid
-            hpo_id = A[3]
-            if hpo_id in hpo_alt_ids:
-                hpo_id = hpo_alt_ids[hpo_id]
-            if hpo_id in hpo.terms:
-                if 'is_obsolete' in hpo.terms[hpo_id]['tags'] and hpo.terms[hpo_id]['tags']['is_obsolete'][0] == 'true':
-                    if 'replaced_by' in hpo.terms[hpo_id]['tags']:
-                        hpo_id = hpo.terms[hpo_id]['tags']['replaced_by'][0]
-                    else:
-                        hpo_id = 'HP:0000001' # So it's general term with a very low IC
-            else:
-                print "%s is not an HPO term"%(A[3])
-                hpo_id = 'HP:0000001' # So it's general term with a very low IC
-            #if A[3] == 'HP:0007852':
-            #    print hpo_id
-            #    sys.exit(1)            
-            #print hpo_id
-            if disease_id not in db:
-                nb_diseases +=1
-                db[disease_id] = { 'phenotypes': [], 'id' : disease_id, 'label': disease_name, 'doid': doid, 'MeSH': disease_id }
-            db[disease_id]['phenotypes'].append(hpo_id)
-            addDiseaseToPhenotype(disease_id, hpo_id)
-            #disease pointer
-            diseaseLookup[disease_id] = db[disease_id]
-            # doid pointer
-            if not doid in doidLookup:
-                doidLookup[doid] = []
-            doidLookup[doid].append(disease_id)
 
     f_obj.close()
     print ",".join(common_diseases.keys())
     
     
-#parse OBO file
-def loadHPO(hpoFilename):
-    global hpo
-    hpo = onto.Ontology.fromOBOFile(hpoFilename)
-    logging.info(hpo.terms['HP:0100006']['tags'].keys())
-    for term_id in hpo.terms:
-        print term_id
-        if 'tags' in hpo.terms[term_id] and 'alt_id' in hpo.terms[term_id]['tags']:
-            for alt_id in hpo.terms[term_id]['tags']['alt_id']:
-                hpo_alt_ids[alt_id] = term_id
+
     
 if __name__ == "__main__":
     main()

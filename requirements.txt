@@ -2,3 +2,5 @@ pytest>=2.5.2
 tox>=1.7.0
 numpy
 scipy
+requests
+elasticsearch==2.1.0
