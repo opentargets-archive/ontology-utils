@@ -244,8 +244,6 @@ def test_parse_properties():
     assert not obj == None
     obj.load_hpo_classes()
     obj.parse_properties(URIRef('http://purl.obolibrary.org/obo/HP_0040064'))
-    vs = "hello"
-    print ("%i"%vs)
 
 @with_setup(my_setup_function, my_teardown_function)
 def test_get_disease_phenotypes():

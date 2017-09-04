@@ -458,7 +458,6 @@ class OntologyClassReader():
            Status: production
         """
         logger.debug("load_hpo_classes...")
-        logger.debug(Config.CACHE_DIRECTORY)
         self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'hpo'))
         base_class = 'http://purl.obolibrary.org/obo/HP_0000118'
         self.load_ontology_classes(base_class=base_class)
