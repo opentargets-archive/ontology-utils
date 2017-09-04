@@ -1,14 +1,30 @@
-import uuid
-from collections import defaultdict
-
 __author__ = 'gautierk'
 import os
 import ConfigParser
+import pkg_resources as res
+
+def file_or_resource(fname=None):
+    '''get filename and check if in getcwd then get from
+    the package resources folder
+    '''
+    filename = os.path.expanduser(fname)
+    print(filename)
+    resource_package = __name__
+    resource_path = '/'.join(('resources', filename))
+    print(resource_path)
+    if filename is not None:
+        abs_filename = os.path.join(os.path.abspath(os.getcwd()), filename) \
+                       if not os.path.isabs(filename) else filename
+
+        return abs_filename if os.path.isfile(abs_filename) \
+            else res.resource_filename(resource_package, resource_path)
 
 iniparser = ConfigParser.ConfigParser()
-#iniparser.read('db.ini')
 
 class Config():
+
+    ONTOLOGY_CONFIG = ConfigParser.ConfigParser()
+    ONTOLOGY_CONFIG.read(file_or_resource('ontology_config.ini'))
 
     CACHE_DIRECTORY = '/Users/koscieln/.ontologycache'
     HPO_DIRECTORY = '%s/hpo'%CACHE_DIRECTORY
