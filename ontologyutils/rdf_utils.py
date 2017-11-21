@@ -569,13 +569,13 @@ class OntologyClassReader():
         self.get_children(phenotypic_abnormality_uri)
 
         for child in self.children[phenotypic_abnormality_uri]:
-            print "%s %s..."%(child['code'], child['label'])
+            print("%s %s..."%(child['code'], child['label']))
             uri = "http://purl.obolibrary.org/obo/" + child['code']
             uriref = URIRef(uri)
             self.rdf_graph.remove((uriref, None, phenotypic_abnormality_uriref))
             self.load_ontology_classes(base_class=uri)
             self.get_classes_paths(root_uri=uri, level=0)
-            print len(self.current_classes)
+            print(len(self.current_classes))
 
     def load_mammalian_phenotype_ontology(self):
         """
@@ -597,13 +597,13 @@ class OntologyClassReader():
         self.get_children(mp_root_uri)
 
         for child in self.children[mp_root_uri]:
-            print "%s %s..."%(child['code'], child['label'])
+            print("%s %s..."%(child['code'], child['label']))
             uri = "http://purl.obolibrary.org/obo/" + child['code']
             uriref = URIRef(uri)
             self.rdf_graph.remove((uriref, None, mp_root_uriref))
             self.load_ontology_classes(base_class=uri)
             self.get_classes_paths(root_uri=uri, level=0)
-            print len(self.current_classes)
+            print(len(self.current_classes))
 
     def load_efo_omim_xrefs(self):
         '''
@@ -841,8 +841,8 @@ class PhenotypeSlim():
                     try:
                         results = self.sparql.query().convert()
                         n = 3
-                    except SPARQLWrapper.SPARQLExceptions.EndPointNotFound, e:
-                        print e
+                    except SPARQLWrapper.SPARQLExceptions.EndPointNotFound as e:
+                        print(e)
                         self._logger.error(e)
                         if n > 2:
                             raise e
@@ -865,8 +865,8 @@ class PhenotypeSlim():
                     ''' Put all the ancestors to the phenotype map '''
                     if ancestor not in self.phenotype_map[direct_child]['superclasses']:
                         self.phenotype_map[direct_child]['superclasses'].append(ancestor)
-                        print "%i %s %s (direct child is %s %s)"%(count, parent_label, ancestor, direct_child_label, direct_child)
-                        print "---------"
+                        print("%i %s %s (direct child is %s %s)"%(count, parent_label, ancestor, direct_child_label, direct_child))
+                        print("---------")
                     #print "%i %s %s (direct child is %s %s)"%(count, parent_label, ancestor, direct_child_label, direct_child)
 
 
@@ -889,7 +889,7 @@ class PhenotypeSlim():
         for p in l:
             if p not in self.phenotype_excluded:
                 self.phenotype_excluded.add(p)
-                print "Excluding %s"%p
+                print("Excluding %s"%p)
                 # get parents
                 sparql_query = DIRECT_ANCESTORS
                 self.sparql.setQuery(sparql_query%(p, p))
