@@ -4,8 +4,8 @@ import time
 import json
 import re
 import sys
-reload(sys);
-sys.setdefaultencoding("utf8");
+#reload(sys)
+#sys.setdefaultencoding("utf8");
 import datetime
 import optparse
 import logging

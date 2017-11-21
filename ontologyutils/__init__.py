@@ -1,7 +1,7 @@
 import re
 import sys
-reload(sys);
-sys.setdefaultencoding("utf8");
+#reload(sys);
+#sys.setdefaultencoding("utf8");
 
 class Ontology(object):
     def __init__(self):
