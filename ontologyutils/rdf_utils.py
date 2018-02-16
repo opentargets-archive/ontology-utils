@@ -1,8 +1,8 @@
 import copy
 import re
 import sys
-#reload(sys)
-#sys.setdefaultencoding("utf8")
+reload(sys)
+sys.setdefaultencoding("utf8")
 import os
 import pysftp
 import gzip
@@ -22,7 +22,7 @@ from datetime import date
 from settings import Config
 
 
-__copyright__ = "Copyright 2014-2017, Open Targets"
+__copyright__ = "Copyright 2014-2018, Open Targets"
 __credits__ = []
 __license__ = "Apache 2.0"
 __version__ = ""
@@ -233,6 +233,7 @@ class OntologyClassReader():
         self.current_classes = dict()
         self.obsolete_classes = dict()
         self.top_level_classes = dict()
+        self.disease_locations = dict()
         self.classes_paths = dict()
         self.obsoletes = dict()
         self.children = dict()
@@ -253,6 +254,147 @@ class OntologyClassReader():
 
         """
         self.rdf_graph.parse(uri, format='xml')
+
+    def get_efo_disease_location(self, base_class=None):
+
+        disease_uri = URIRef("http://www.ebi.ac.uk/efo/EFO_0000178")
+        for s, p, o in self.rdf_graph.triples((disease_uri, None, None)):
+            print "%s - %s  - %s" % (s, p, o)
+
+        sparql_query = '''
+            SELECT DISTINCT ?s ?label ?o ?o_label WHERE {
+            ?s rdfs:subClassOf* <%s> . 
+            ?s rdfs:label ?label .
+            ?s rdfs:subClassOf ?restriction . 
+            ?restriction rdf:type owl:Restriction .
+            ?restriction owl:onProperty efo:EFO_0000784 .
+            ?restriction owl:someValuesFrom ?o .
+            ?o rdfs:label ?o_label
+        }
+        '''
+
+        qres = self.rdf_graph.query(sparql_query % base_class)
+
+        for (ont_node, ont_label, d_node, d_label) in qres:
+            uri = str(ont_node)
+            label = str(ont_label)
+            location_uri = str(d_node)
+            location_label = str(d_label)
+            print("%s %s %s %s" % (uri, label, location_uri, location_label))
+            if uri not in self.disease_locations:
+                self.disease_locations[uri] = []
+            self.disease_locations[uri].append(dict(iri=location_uri, label=location_label))
+
+        '''
+            ?restriction (rdfs:subClassOf|(owl:intersectionOf/rdf:rest*/rdf:first))*
+            https://www.ebi.ac.uk/rdf/services/sparql?query=PREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+owl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0D%0APREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E%0D%0APREFIX+dc%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+dcterms%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+dbpedia2%3A+%3Chttp%3A%2F%2Fdbpedia.org%2Fproperty%2F%3E%0D%0APREFIX+dbpedia%3A+%3Chttp%3A%2F%2Fdbpedia.org%2F%3E%0D%0APREFIX+foaf%3A+%3Chttp%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2F%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E+%0D%0APREFIX+efo%3A+%3Chttp%3A%2F%2Fwww.ebi.ac.uk%2Fefo%2F%3E%0D%0ASELECT+DISTINCT+%3Fsubject+%3Flabel+%3Frestriction+%0D%0AFROM+%3Chttp%3A%2F%2Frdf.ebi.ac.uk%2Fdataset%2Fefo%3E+%0D%0AWHERE+%7B%0D%0A++++++++++++%3Fsubject+rdfs%3AsubClassOf*+efo%3AEFO_0000408+.%0D%0A++++++++++++%3Fsubject+rdfs%3Alabel+%3Flabel+.%0D%0A++++++++++++%3Fsubject+rdfs%3AsubClassOf+%3Frestriction+.%0D%0A++++++++++++%3Frestriction+rdf%3Atype+owl%3ARestriction+.%0D%0A++++++++++++%3Frestriction+owl%3AonProperty+efo%3AEFO_0000784+.+%0D%0A++++++++%7D&render=HTML&limit=25&offset=0#loadstar-results-section
+        '''
+        sparql_query = '''
+            SELECT DISTINCT ?s ?label ?loc_uri ?loc_label WHERE {
+            ?s rdfs:subClassOf* <%s> . 
+            ?s rdfs:label ?label .
+            ?s rdfs:subClassOf ?restriction . 
+            ?restriction rdf:type owl:Restriction .
+            ?restriction owl:onProperty efo:EFO_0000784 .
+            ?restriction owl:someValuesFrom ?loc .
+            ?loc owl:unionOf ?u .
+            ?u rdf:rest*/rdf:first ?loc_uri .
+            ?loc_uri rdfs:label ?loc_label
+        }
+        '''
+
+        qres = self.rdf_graph.query(sparql_query % base_class)
+
+        for (ont_node, ont_label, d_node, d_label) in qres:
+            uri = str(ont_node)
+            label = str(ont_label)
+            location_uri = str(d_node)
+            location_label = str(d_label)
+            print("%s %s %s %s" % (uri, label, location_uri, location_label))
+            if uri not in self.disease_locations:
+                self.disease_locations[uri] = []
+            self.disease_locations[uri].append(dict(iri=location_uri, label=location_label))
+
+    def get_deprecated_classes(self, obsoleted_in_version=False):
+
+        count = 0
+
+        # do this once
+        if len(self.obsoletes) == 0:
+
+            sparql_query = '''
+            SELECT DISTINCT ?ont_node ?label ?label ?ont_new
+             {
+                ?ont_node owl:deprecated true .
+                ?ont_node obo:IAO_0100001 ?ont_new_id .
+                ?ont_new oboInOwl:id ?ont_new_id .
+                ?ont_node rdfs:label ?label
+             }
+            '''
+
+            if obsoleted_in_version:
+
+                sparql_query = '''
+                                SELECT DISTINCT ?ont_node ?label ?reason ?ont_new_id
+                                 {
+                                    ?ont_node rdfs:subClassOf oboInOwl:ObsoleteClass . 
+                                    ?ont_node obo:IAO_0100001 ?ont_new_id . 
+                                    ?ont_node rdfs:label ?label . 
+                                    ?ont_node efo:reason_for_obsolescence ?reason
+                                 }
+                                '''
+
+
+                '''
+                <rdfs:subClassOf rdf:resource="http://www.geneontology.org/formats/oboInOwl#ObsoleteClass"/>
+                <obo:IAO_0100001 rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http://www.ebi.ac.uk/efo/EFO_0002067</obo:IAO_0100001>
+                <efo:obsoleted_in_version>2.44</efo:obsoleted_in_version>
+                <efo:reason_for_obsolescence>Duplicate with class K562 http://www.ebi.ac.uk/efo/EFO_0002067</efo:reason_for_obsolescence>
+                '''
+
+            qres = self.rdf_graph.query(sparql_query)
+
+            for (ont_node, ont_label, ont_reason, ont_new_id) in qres:
+                uri = str(ont_node)
+                label = str(ont_label)
+                reason_for_obsolescence = str(ont_reason)
+                # unfortunately there may be some trailing spaces!
+                new_uri = str(ont_new_id).strip()
+                # point to the new URI
+                self.obsoletes[uri] = {'label': label,
+                                       'new_uri': new_uri,
+                                       'reason_for_obsolescence': reason_for_obsolescence,
+                                       'processed': False}
+                count +=1
+                logger.debug("WARNING: Obsolete %s %s '%s' %s" % (uri, label, reason_for_obsolescence, new_uri))
+
+        """
+        Still need to loop over to find the next new class to replace the
+        old URI with the latest URI (some intermediate classes can be obsolete too)
+        """
+
+        for old_uri, record in self.obsoletes.items():
+            if not record['processed']:
+                next_uri = self.obsoletes[old_uri]['new_uri']
+                next_reason = self.obsoletes[old_uri]['reason_for_obsolescence']
+                while next_uri in self.obsoletes.keys():
+                    prev_uri = next_uri
+                    next_uri = self.obsoletes[prev_uri]['new_uri']
+                    if next_uri == prev_uri:
+                        break
+                    next_reason = self.obsoletes[prev_uri]['reason_for_obsolescence']
+                if next_uri in self.current_classes:
+                    new_label = self.current_classes[next_uri]
+                    logger.warn("%s => %s" % (old_uri, self.obsoletes[old_uri]))
+                    self.obsolete_classes[old_uri] = "Use %s label:%s (reason: %s)" % (next_uri, new_label, next_reason)
+                else:
+                    # load the class
+                    self.obsolete_classes[old_uri] = next_reason
+                # mark the record as processed
+                record['processed'] = True
+
+        return count
+
 
     def load_ontology_classes(self, base_class=None):
         """Loads all current and obsolete classes from an ontology stored in RDFLib
@@ -474,12 +616,21 @@ class OntologyClassReader():
         #self.get_ontology_top_levels(base_class, top_level_map=self.phenotype_top_levels)
 
 
-    def load_efo_classes(self):
+    def load_efo_classes(self, lightweight=False, with_uberon=False):
         """Loads the EFO graph and extracts the current and obsolete classes.
            Status: production
         """
         logger.debug("load_efo_classes...")
+        print("load EFO classes...")
         self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'efo'))
+        if with_uberon == True:
+            logger.debug("load Uberon classes...")
+            print("load Uberon classes...")
+            self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'uberon'))
+
+        print("Done")
+        if lightweight == True:
+            return
 
         # load disease, phenotype, measurement, biological process, function and injury and mental health
         for base_class in [ 'http://www.ebi.ac.uk/efo/EFO_0000408',
@@ -490,6 +641,7 @@ class OntologyClassReader():
                             'http://www.ebi.ac.uk/efo/EFO_0000546',
                             'http://www.ebi.ac.uk/efo/EFO_0003935' ]:
             self.load_ontology_classes(base_class=base_class)
+            self.get_efo_disease_location(base_class=base_class)
 
     def load_open_targets_disease_ontology(self):
         """Loads the EFO graph and extracts the current and obsolete classes.
