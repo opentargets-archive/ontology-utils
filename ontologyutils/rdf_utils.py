@@ -257,10 +257,6 @@ class OntologyClassReader():
 
     def get_efo_disease_location(self, base_class=None):
 
-        disease_uri = URIRef("http://www.ebi.ac.uk/efo/EFO_0000178")
-        for s, p, o in self.rdf_graph.triples((disease_uri, None, None)):
-            print "%s - %s  - %s" % (s, p, o)
-
         sparql_query = '''
             SELECT DISTINCT ?s ?label ?o ?o_label WHERE {
             ?s rdfs:subClassOf* <%s> . 
@@ -282,8 +278,9 @@ class OntologyClassReader():
             location_label = str(d_label)
             print("%s %s %s %s" % (uri, label, location_uri, location_label))
             if uri not in self.disease_locations:
-                self.disease_locations[uri] = []
-            self.disease_locations[uri].append(dict(iri=location_uri, label=location_label))
+                self.disease_locations[uri] = dict()
+            if location_uri not in self.disease_locations[uri]:
+                self.disease_locations[uri][location_uri] = location_label
 
         '''
             ?restriction (rdfs:subClassOf|(owl:intersectionOf/rdf:rest*/rdf:first))*
@@ -312,8 +309,10 @@ class OntologyClassReader():
             location_label = str(d_label)
             print("%s %s %s %s" % (uri, label, location_uri, location_label))
             if uri not in self.disease_locations:
-                self.disease_locations[uri] = []
-            self.disease_locations[uri].append(dict(iri=location_uri, label=location_label))
+                self.disease_locations[uri] = dict()
+            if location_uri not in self.disease_locations[uri]:
+                self.disease_locations[uri][location_uri] = location_label
+
 
     def get_deprecated_classes(self, obsoleted_in_version=False):
 

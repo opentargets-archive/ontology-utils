@@ -1,6 +1,6 @@
 '''
-Copyright 2014-2016 EMBL - European Bioinformatics Institute, Wellcome
-Trust Sanger Institute, GlaxoSmithKline and Biogen
+Copyright 2014-2018 EMBL - European Bioinformatics Institute, Wellcome
+Trust Sanger Institute, GlaxoSmithKline, Biogen and Takeda
 
 This software was developed as part of Open Targets. For more information please see:
 
@@ -28,12 +28,12 @@ from settings import Config
 import logging
 import os
 
-__copyright__ = "Copyright 2014-2017, Open Targets"
+__copyright__ = "Copyright 2014-2018, Open Targets"
 __credits__ = []
 __license__ = "Apache 2.0"
 __version__ = ""
 __maintainer__ = "Gautier Koscielny"
-__email__ = "gautierk@opentargets.org"
+__email__ = "gautier.x.koscielny@gsk.com"
 __status__ = "Production"
 
 logger = logging.getLogger(__name__)
