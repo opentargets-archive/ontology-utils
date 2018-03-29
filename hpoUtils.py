@@ -16,7 +16,7 @@ import numpy
 import math
 import operator
 from functools import partial
-from settings import Config
+from ou_settings import Config
 
 hpo = None
 ICs = {}

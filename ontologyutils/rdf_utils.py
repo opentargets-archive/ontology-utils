@@ -19,7 +19,7 @@ from rdflib.namespace import OWL, RDF, RDFS
 from SPARQLWrapper import SPARQLWrapper, JSON
 from tqdm import tqdm
 from datetime import date
-from settings import Config
+from ou_settings import Config
 
 
 __copyright__ = "Copyright 2014-2018, Open Targets"
@@ -337,7 +337,7 @@ class OntologyClassReader():
                                 SELECT DISTINCT ?ont_node ?label ?reason ?ont_new_id
                                  {
                                     ?ont_node rdfs:subClassOf oboInOwl:ObsoleteClass . 
-                                    ?ont_node obo:IAO_0100001 ?ont_new_id . 
+                                    ?ont_node obo:IAO_0100001 ?ont_new_id .
                                     ?ont_node rdfs:label ?label . 
                                     ?ont_node efo:reason_for_obsolescence ?reason
                                  }
@@ -394,7 +394,6 @@ class OntologyClassReader():
 
         return count
 
-
     def load_ontology_classes(self, base_class=None):
         """Loads all current and obsolete classes from an ontology stored in RDFLib
 
@@ -437,43 +436,7 @@ class OntologyClassReader():
             # logger.debug("RDFLIB '%s' '%s'" % (uri, label))
         logger.debug("parsed %i classes"%count)
 
-        sparql_query = '''
-        SELECT DISTINCT ?ont_node ?label ?id ?ont_new
-         {
-            ?ont_node owl:deprecated true .
-            ?ont_node oboInOwl:id ?id .
-            ?ont_node obo:IAO_0100001 ?ont_new_id .
-            ?ont_new oboInOwl:id ?ont_new_id .
-            ?ont_node rdfs:label ?label
-         }
-        '''
-
-        qres = self.rdf_graph.query(sparql_query)
-        for (ont_node, ont_label, ont_id, ont_new) in qres:
-            uri = str(ont_node)
-            label = str(ont_label)
-            id = str(ont_id)
-            new_uri = str(ont_new)
-            # point to the new URI
-            self.obsoletes[uri] = { 'label': label, 'new_uri' : new_uri }
-            count +=1
-            logger.debug("WARNING: Obsolete %s '%s' %s" % (uri, label, new_uri))
-
-        """
-        Still need to loop over to find the next new class to replace the
-        old URI with the latest URI (some intermediate classes can be obsolete too)
-        """
-
-        for old_uri in self.obsoletes.keys():
-            next_uri = self.obsoletes[old_uri]['new_uri']
-            while next_uri in self.obsoletes.keys():
-                next_uri = self.obsoletes[next_uri]['new_uri']
-            if next_uri in self.current_classes:
-                new_label = self.current_classes[next_uri]
-                logger.warn("%s => %s" % (old_uri, self.obsoletes[old_uri]))
-                self.obsolete_classes[old_uri] = "Use %s label:%s" % (next_uri, new_label)
-            else:
-                self.obsolete_classes[old_uri] = "Obsolete class"
+    def get_top_levels(self, base_class=None):
 
         sparql_query = '''
         select DISTINCT ?top_level ?top_level_label
@@ -489,9 +452,8 @@ class OntologyClassReader():
             label = str(row[1])
             self.top_level_classes[uri] = label
 
-        return
-
     def get_children(self, uri):
+
         disease_uri = URIRef(uri)
         if uri not in self.children:
             self.children[uri] = []
@@ -594,34 +556,58 @@ class OntologyClassReader():
         '''
         return rdf_properties
 
+    def _get_from_pickled_file_cache(self, file_id):
+        file_path = os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), file_id+'.pck')
+        if os.path.isfile(file_path):
+            return pickle.load(open(file_path, 'rb'))
+
+    def _set_in_pickled_file_cache(self, obj, file_id):
+        if not os.path.isdir(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'))):
+            os.makedirs(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir')))
+        file_path = os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), file_id+'.pck')
+        pickle.dump(obj,
+                    open(file_path, 'wb'),)
+
     def load_hpo_classes(self):
         """Loads the HPO graph and extracts the current and obsolete classes.
            Status: production
         """
         logger.debug("load_hpo_classes...")
+
         self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'hpo'))
+
         base_class = 'http://purl.obolibrary.org/obo/HP_0000118'
         self.load_ontology_classes(base_class=base_class)
+        self.get_deprecated_classes()
+        self.get_top_levels(base_class= base_class)
 
     def load_mp_classes(self):
         """Loads the HPO graph and extracts the current and obsolete classes.
            Status: production
         """
         logger.debug("load_mp_classes...")
+
+
+        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
+
         self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
         base_class = 'http://purl.obolibrary.org/obo/MP_0000001'
         self.load_ontology_classes(base_class= base_class)
+        self.get_deprecated_classes()
+        self.get_top_levels(base_class= base_class)
 
         #self.get_ontology_top_levels(base_class, top_level_map=self.phenotype_top_levels)
-
 
     def load_efo_classes(self, lightweight=False, with_uberon=False):
         """Loads the EFO graph and extracts the current and obsolete classes.
            Status: production
         """
         logger.debug("load_efo_classes...")
+
         print("load EFO classes...")
+
         self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'efo'))
+
         if with_uberon == True:
             logger.debug("load Uberon classes...")
             print("load Uberon classes...")
@@ -640,7 +626,55 @@ class OntologyClassReader():
                             'http://www.ebi.ac.uk/efo/EFO_0000546',
                             'http://www.ebi.ac.uk/efo/EFO_0003935' ]:
             self.load_ontology_classes(base_class=base_class)
-            self.get_efo_disease_location(base_class=base_class)
+            self.get_top_levels(base_class=base_class)
+            #self.get_efo_disease_location(base_class=base_class)
+        self.get_deprecated_classes()
+
+
+    def get_hpo(self):
+        '''
+        Load HPO to accept phenotype terms that are not in EFO
+        :return:
+        '''
+        cache_file = 'rdfutils_hpo_lookup'
+        obj = self._get_from_pickled_file_cache(cache_file)
+        if obj is None:
+            obj = OntologyClassReader()
+            obj.load_hpo_classes()
+            obj.rdf_graph = None
+            self._set_in_pickled_file_cache(obj, cache_file)
+        return obj
+
+    def get_mp(self):
+        '''
+        Load MP to accept phenotype terms that are not in EFO
+        :return:
+        '''
+        cache_file = 'rdfutils_mp_lookup'
+        obj = None
+        obj = self._get_from_pickled_file_cache(cache_file)
+        if obj is None:
+            obj = OntologyClassReader()
+            obj.load_mp_classes()
+            obj.rdf_graph = None
+            self._set_in_pickled_file_cache(obj, cache_file)
+        return obj
+
+
+
+    def get_efo(self):
+        '''
+        Load EFO current and obsolete classes to report them to data providers
+        :return:
+        '''
+        cache_file = 'rdfutils_efo_lookup'
+        obj = self._get_from_pickled_file_cache(cache_file)
+        if obj is None:
+            obj = OntologyClassReader()
+            obj.load_efo_classes()
+            obj.rdf_graph = None
+            self._set_in_pickled_file_cache(obj, cache_file)
+        return obj
 
     def load_open_targets_disease_ontology(self):
         """Loads the EFO graph and extracts the current and obsolete classes.
@@ -651,6 +685,14 @@ class OntologyClassReader():
         """
         logger.debug("load_open_targets_disease_ontology...")
         self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'efo'))
+        all_ns = [n for n in self.rdf_graph.namespace_manager.namespaces()]
+
+        self.get_deprecated_classes(obsoleted_in_version=True)
+
+        '''
+        get the original top_levels from EFO
+        '''
+        self.get_top_levels(base_class='http://www.ebi.ac.uk/efo/EFO_0000408')
 
         '''
         Detach the TAs from the disease node
@@ -671,6 +713,9 @@ class OntologyClassReader():
         # namespace_manager = NamespaceManager(self.rdf_graph)
         self.rdf_graph.namespace_manager.bind('cttv', cttv)
 
+        '''
+        Some diseases have no categories, let's create a category for them
+        '''
         other_disease_uri = URIRef('http://www.targetvalidation.org/disease/other')
         self.rdf_graph.add((other_disease_uri, RDF.type, rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class')))
         self.rdf_graph.add([other_disease_uri, RDFS.label, rdflib.Literal('other disease')])
@@ -696,6 +741,7 @@ class OntologyClassReader():
                             'http://www.ebi.ac.uk/efo/EFO_0001444',
                             'http://purl.obolibrary.org/obo/GO_0008150',
                             'http://www.ifomis.org/bfo/1.1/snap#Function']:
+
             self.load_ontology_classes(base_class=base_class)
             self.get_classes_paths(root_uri=base_class, level=0)
 
@@ -720,13 +766,14 @@ class OntologyClassReader():
         self.get_children(phenotypic_abnormality_uri)
 
         for child in self.children[phenotypic_abnormality_uri]:
-            print("%s %s..."%(child['code'], child['label']))
+            print "%s %s..."%(child['code'], child['label'])
             uri = "http://purl.obolibrary.org/obo/" + child['code']
             uriref = URIRef(uri)
             self.rdf_graph.remove((uriref, None, phenotypic_abnormality_uriref))
             self.load_ontology_classes(base_class=uri)
             self.get_classes_paths(root_uri=uri, level=0)
-            print(len(self.current_classes))
+            self.get_deprecated_classes()
+            print len(self.current_classes)
 
     def load_mammalian_phenotype_ontology(self):
         """
@@ -748,13 +795,13 @@ class OntologyClassReader():
         self.get_children(mp_root_uri)
 
         for child in self.children[mp_root_uri]:
-            print("%s %s..."%(child['code'], child['label']))
+            print "%s %s..."%(child['code'], child['label'])
             uri = "http://purl.obolibrary.org/obo/" + child['code']
             uriref = URIRef(uri)
             self.rdf_graph.remove((uriref, None, mp_root_uriref))
             self.load_ontology_classes(base_class=uri)
             self.get_classes_paths(root_uri=uri, level=0)
-            print(len(self.current_classes))
+            print len(self.current_classes)
 
     def load_efo_omim_xrefs(self):
         '''
@@ -858,7 +905,6 @@ class OntologyClassReader():
         for base_class in ['http://purl.obolibrary.org/obo/ECO_0000000', 'http://purl.obolibrary.org/obo/SO_0000400', 'http://purl.obolibrary.org/obo/SO_0001260', 'http://purl.obolibrary.org/obo/SO_0000110', 'http://purl.obolibrary.org/obo/SO_0001060' ]:
             self.load_ontology_classes(base_class=base_class)
             self.get_classes_paths(root_uri=base_class, level=0)
-
 
 class DiseaseUtils():
 

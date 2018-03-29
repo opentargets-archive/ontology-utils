@@ -24,7 +24,7 @@ from nose.tools.nontrivial import with_setup
 from ontologyutils.rdf_utils import OntologyClassReader, PhenotypeSlim, DiseaseUtils, EFO_TAS
 from rdflib import URIRef
 from SPARQLWrapper import SPARQLWrapper, JSON
-from settings import Config
+from ou_settings import Config
 import logging
 import os
 

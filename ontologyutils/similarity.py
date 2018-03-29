@@ -5,7 +5,7 @@ import operator
 import json
 import numpy as np
 import StringIO
-from settings import Config
+from ou_settings import Config
 
 
 __author__ = 'gautierk'

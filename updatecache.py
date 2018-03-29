@@ -1,4 +1,4 @@
-from settings import Config
+from ou_settings import Config
 from ontologyutils.hpo import HPODownloader
 from ontologyutils.efo import EFODownloader
 import logging
