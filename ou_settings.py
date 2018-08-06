@@ -25,7 +25,6 @@ class Config():
 
     ONTOLOGY_CONFIG = ConfigParser.ConfigParser()
     ONTOLOGY_CONFIG.read(file_or_resource('ontology_config.ini'))
-    print('Wokred!')
     CACHE_DIRECTORY = '/Users/otvisitor/Documents/.ontologycache'
     HPO_DIRECTORY = '%s/hpo'%CACHE_DIRECTORY
     HPO_OBO_DIRECTORY = '%s/obo'%HPO_DIRECTORY

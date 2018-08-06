@@ -23,6 +23,8 @@ class Ontology(object):
         data = {}
         for line in term:
             tag = line.split(': ',1)[0]
+            # calculate the length of the first split
+            #value = line[len(tag)+2:]
             value = line.split(': ',1)[1]
             if re.match("!", value):
                 value = value.split("!")[0]
