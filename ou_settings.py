@@ -26,7 +26,7 @@ class Config():
     ONTOLOGY_CONFIG = ConfigParser.ConfigParser()
     ONTOLOGY_CONFIG.read(file_or_resource('ontology_config.ini'))
     print('Wokred!')
-    CACHE_DIRECTORY = '/Users/koscieln/.ontologycache'
+    CACHE_DIRECTORY = '/Users/otvisitor/Documents/.ontologycache'
     HPO_DIRECTORY = '%s/hpo'%CACHE_DIRECTORY
     HPO_OBO_DIRECTORY = '%s/obo'%HPO_DIRECTORY
     HPO_ANNOTATIONS_DIRECTORY = '%s/annotations'%HPO_DIRECTORY
@@ -59,7 +59,8 @@ class Config():
         'http://sourceforge.net/p/efo/code/HEAD/tree/trunk/src/efoinobo/efo.obo?format=raw',
     ]
     EFO_FILES = dict(
-        obo = '%s/efo.obo'%EFO_OBO_DIRECTORY
+        obo = '%s/efo.obo'%EFO_OBO_DIRECTORY,
+        obo_full='%s/efo_full.obo' % EFO_OBO_DIRECTORY
     )
 
     MESH_DIRECTORY = '%s/mesh'%CACHE_DIRECTORY

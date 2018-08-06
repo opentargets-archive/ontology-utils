@@ -587,9 +587,6 @@ class OntologyClassReader():
         """
         logger.debug("load_mp_classes...")
 
-
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
-
         self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
         base_class = 'http://purl.obolibrary.org/obo/MP_0000001'
         self.load_ontology_classes(base_class= base_class)
@@ -958,7 +955,7 @@ class DiseaseUtils():
 
     def get_disease_phenotypes(self, ontologyclassreader=None):
 
-        disease_phenotypes_map = {}
+        disease_phenotypes_map = dict()
 
         if self.check_disease_phenotypes_cache():
             return self.read_disease_phenotypes_cache()
