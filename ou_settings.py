@@ -1,7 +1,14 @@
-__author__ = 'gautierk'
 import os
 import ConfigParser
 import pkg_resources as res
+
+__copyright__ = "Copyright 2014-2018, Open Targets"
+__credits__ = ["Gautier Koscielny"]
+__license__ = "Apache 2.0"
+__version__ = "1.0"
+__maintainer__ = "Gautier Koscielny"
+__email__ = "gautier.x.koscielny@gsk.com"
+__status__ = "Production"
 
 def file_or_resource(fname=None):
     '''get filename and check if in getcwd then get from
@@ -20,12 +27,24 @@ def file_or_resource(fname=None):
             else res.resource_filename(resource_package, resource_path)
 
 iniparser = ConfigParser.ConfigParser()
+iniparser.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'env.ini'))
 
 class Config():
+    # print "OS SEP %s %s"%(os.sep, os.path.sep)
+    HAS_PROXY = iniparser.has_section('proxy')
+    if HAS_PROXY:
+        PROXY = iniparser.get('proxy', 'protocol') + "://" + iniparser.get('proxy', 'username') + ":" + iniparser.get(
+            'proxy', 'password') + "@" + iniparser.get('proxy', 'host') + ":" + iniparser.get('proxy', 'port')
+        PROXY_PROTOCOL = iniparser.get('proxy', 'protocol')
+        PROXY_USERNAME = iniparser.get('proxy', 'username')
+        PROXY_PASSWORD = iniparser.get('proxy', 'password')
+        PROXY_HOST = iniparser.get('proxy', 'host')
+        PROXY_PORT = int(iniparser.get('proxy', 'port'))
 
+    CACHE_DIRECTORY = iniparser.get('cache', 'directory')
+    
     ONTOLOGY_CONFIG = ConfigParser.ConfigParser()
     ONTOLOGY_CONFIG.read(file_or_resource('ontology_config.ini'))
-    CACHE_DIRECTORY = '/Users/otvisitor/Documents/.ontologycache'
     HPO_DIRECTORY = '%s/hpo'%CACHE_DIRECTORY
     HPO_OBO_DIRECTORY = '%s/obo'%HPO_DIRECTORY
     HPO_ANNOTATIONS_DIRECTORY = '%s/annotations'%HPO_DIRECTORY
