@@ -47,7 +47,7 @@ class Ontology(object):
      
     def loadOBOOntology(self, filename):
         #oboFile = open('C:\Users\gk680303\Documents\ontologies\hp.obo','r')
-        oboFile = open(filename,'r')
+        oboFile = open(filename, mode='rt', encoding='utf-8')
         #skip the file header lines
         self.getTerm(oboFile)
 
