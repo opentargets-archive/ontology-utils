@@ -19,9 +19,9 @@ from functools import partial
 from ou_settings import Config
 
 hpo = None
-ICs = {}
-ancestors = {}
-micas = {}
+ICs = dict()
+ancestors = dict()
+micas = dict()
 def main():
 
     parser = optparse.OptionParser()
@@ -157,7 +157,7 @@ def getCD2RDSimilarity(cd, rd, rdSet):
 
 
 def getCD2RDs(cd, rdSet, cutoff=2, limit=20):
-    diseasePairs = {}
+    diseasePairs = dict()
     topScore = []
     #for n in range(0,20):
     global rare_diseases;
@@ -185,7 +185,7 @@ def getCD2CDs(cd1, cutoff=2, limit=20):
             return;
 
 def getRD2CDs(rd, rdSet, cutoff=2, limit=20):
-    diseasePairs = {}
+    diseasePairs = dict()
     topScore = []
     #for n in range(0,20):
     global rare_diseases;
@@ -201,7 +201,7 @@ def getRD2CDs(rd, rdSet, cutoff=2, limit=20):
             return;            
             
 def getTop20SimilarDiseases():
-    diseasePairs = {}
+    diseasePairs = dict()
     topScore = []
     #for n in range(0,20):
     global rare_diseases;

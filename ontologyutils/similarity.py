@@ -15,9 +15,9 @@ LIMIT = 1000
 class OntologyLookup(object):
     def __init__(self, obo_file=None):
         self.ontology = None
-        self.term_to_disease_lookup = {}
-        self.ancestors = {}
-        self.alt_ids = {}
+        self.term_to_disease_lookup = dict()
+        self.ancestors = dict()
+        self.alt_ids = dict()
         self.load_classes(obo_file)
         #self.generate_ancestors()
         pass
@@ -86,12 +86,12 @@ class PhenotypeLookup(OntologyLookup):
 class Diseases(object):
     def __init__(self, phenotype_lookup):
         # store the keys of disease datasets
-        self.datasets = {}
+        self.datasets = dict()
         self.nb_diseases = 0
-        self.disease_lookup = {}
-        self.do_lookup = {}
+        self.disease_lookup = dict()
+        self.do_lookup = dict()
         self.phenotype_lookup = phenotype_lookup
-        self.ICs = {}
+        self.ICs = dict()
         self.MICAs = np.empty([1, 1], dtype=float)
 
     def load_rare_diseases(self, rdFilename):
@@ -102,7 +102,7 @@ class Diseases(object):
                 A = line.rstrip("\n").split("\t")
                 # print A[2]
                 if A[0] not in self.datasets:
-                    self.datasets[A[0]] = {}
+                    self.datasets[A[0]] = dict()
                 db = self.datasets[A[0]]
                 disease_name = A[2]
                 disease_id = A[0] + ":" + A[1]
@@ -144,7 +144,7 @@ class Diseases(object):
             for line in f_obj:
                 A = line.rstrip("\n").split("\t")
                 if 'MeSH' not in self.datasets:
-                    self.datasets['MeSH'] = {}
+                    self.datasets['MeSH'] = dict()
                 db = self.datasets['MeSH']
                 disease_name = A[1]
                 disease_id = A[0]

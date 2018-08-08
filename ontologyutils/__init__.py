@@ -7,9 +7,9 @@ class Ontology(object):
     def __init__(self):
 
         #keys are the term ids
-        self.terms = {}
-        self.dbxrefs = {}
-        self.altids = {}
+        self.terms = dict()
+        self.dbxrefs = dict()
+        self.altids = dict()
         self.oboNamespace = 'http://purl.obolibrary.org/obo/'
         self.ordoNamespace = 'http://www.orpha.net/ORDO/'
 
@@ -20,7 +20,7 @@ class Ontology(object):
         return obj
 
     def parseTagValue(self, term):
-        data = {}
+        data = dict()
         for line in term:
             tag = line.split(': ',1)[0]
             # calculate the length of the first split
@@ -38,7 +38,7 @@ class Ontology(object):
                     #print "{0}\n".format(v.rstrip())
                     value = v.rstrip()
                 
-            if not data.has_key(tag):
+            if tag not in data.keys():
                 data[tag] = []
 
             data[tag].append(value)
@@ -62,10 +62,10 @@ class Ontology(object):
             #only add to the structure if the term has a is_a tag
             #the is_a value contain GOID and term definition
             #we only want the GOID
-            if term.has_key('is_a'):
+            if 'is_a' in term.keys():
               termParents = [p.split()[0] for p in term['is_a']]
 
-              if not self.terms.has_key(termID):
+              if termID not in self.terms.keys():
                 #each goid will have two arrays of parents and children
                 self.terms[termID] = {'p':[],'c':[], 'tags':term}
                 # reverse dictionnary from xref to term
@@ -85,7 +85,7 @@ class Ontology(object):
 
               #for every parent term, add this current term as children
               for termParent in termParents:
-                if not self.terms.has_key(termParent):
+                if termParent not in self.terms.keys():
                   self.terms[termParent] = {'p':[],'c':[]}
                 self.terms[termParent]['c'].append(termID)
           else:

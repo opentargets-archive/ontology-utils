@@ -527,7 +527,7 @@ class OntologyClassReader():
     def parse_properties(self, rdf_node):
         logger.debug("parse_properties for rdf_node: {}".format(rdf_node))
         raw_properties = predicate_objects = list(self.rdf_graph.predicate_objects(subject=rdf_node))
-        rdf_properties = {}
+        rdf_properties = dict()
         logger.debug("raw_properties for rdf_node: {}".format(rdf_node))
         for index, property in enumerate(raw_properties):
             logger.debug("{}. {}".format(index, property))
@@ -1008,7 +1008,7 @@ class PhenotypeSlim():
         #self.efo = OntologyClassReader()
         #self.efo.load_efo_classes()
 
-        self.phenotype_map = {}
+        self.phenotype_map = dict()
         self.phenotype_excluded = set()
 
         self._remote_filenames = dict()

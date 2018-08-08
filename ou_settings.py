@@ -1,5 +1,5 @@
 import os
-import ConfigParser
+import configparser
 import pkg_resources as res
 
 __copyright__ = "Copyright 2014-2018, Open Targets"
@@ -26,7 +26,7 @@ def file_or_resource(fname=None):
         return abs_filename if os.path.isfile(abs_filename) \
             else res.resource_filename(resource_package, resource_path)
 
-iniparser = ConfigParser.ConfigParser()
+iniparser = configparser.ConfigParser()
 iniparser.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'env.ini'))
 
 class Config():
@@ -43,7 +43,7 @@ class Config():
 
     CACHE_DIRECTORY = iniparser.get('cache', 'directory')
     
-    ONTOLOGY_CONFIG = ConfigParser.ConfigParser()
+    ONTOLOGY_CONFIG = configparser.ConfigParser()
     ONTOLOGY_CONFIG.read(file_or_resource('ontology_config.ini'))
     HPO_DIRECTORY = '%s/hpo'%CACHE_DIRECTORY
     HPO_OBO_DIRECTORY = '%s/obo'%HPO_DIRECTORY

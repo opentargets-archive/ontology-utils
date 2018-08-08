@@ -1,3 +1,4 @@
+import sys
 import csv
 import optparse
 import json
@@ -18,7 +19,7 @@ def get_url_from_ontology_id(id):
         # http://purl.obolibrary.org/obo/
         return "http://purl.obolibrary.org/obo/" + base_code
     else:
-        print "Unknown code!!! %s" %(id)
+        print("Unknown code!!! %s" %(id))
         sys.exit(1)
 
 def main():
@@ -33,8 +34,9 @@ def main():
     efo = onto.Ontology.fromOBOFile(options.efoFilename)
 
     # Write results to file
-    with open(options.outputFilename, mode='wb') as zf:
+    with open(options.outputFilename, mode='w') as zf:
         writer = csv.writer(zf, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        # strings are Unicode
         writer.writerow(['efo_id', 'efo_uri', 'efo_label'])
         for id in efo.terms:
 
@@ -42,6 +44,7 @@ def main():
 
             # only look at specific ancestors
             if 'EFO:0000408' in ancestors or 'EFO:0000651' in ancestors or 'EFO:0001444' in ancestors:
+
                 try:
                     # property_value: EFO:URI
                     efo_uri = get_url_from_ontology_id(id)
