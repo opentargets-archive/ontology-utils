@@ -34,7 +34,7 @@ def main():
     efo = onto.Ontology.fromOBOFile(options.efoFilename)
 
     # Write results to file
-    with open(options.outputFilename, mode='w') as zf:
+    with open(options.outputFilename, mode='wt', encoding='utf-8') as zf:
         writer = csv.writer(zf, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         # strings are Unicode
         writer.writerow(['efo_id', 'efo_uri', 'efo_label'])
