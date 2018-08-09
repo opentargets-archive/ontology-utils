@@ -27,7 +27,9 @@ def file_or_resource(fname=None):
             else res.resource_filename(resource_package, resource_path)
 
 iniparser = configparser.ConfigParser()
-iniparser.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'env.ini'))
+env_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'env.ini')
+if os.path.isfile(env_file):
+    iniparser.read(env_file)
 
 class Config():
     # print "OS SEP %s %s"%(os.sep, os.path.sep)
@@ -40,9 +42,16 @@ class Config():
         PROXY_PASSWORD = iniparser.get('proxy', 'password')
         PROXY_HOST = iniparser.get('proxy', 'host')
         PROXY_PORT = int(iniparser.get('proxy', 'port'))
+    elif 'HTTP_PROXY' in os.environ:
+        PROXY = os.environ['HTTP_PROXY']
 
-    CACHE_DIRECTORY = iniparser.get('cache', 'directory')
-    
+    HAS_CACHE = iniparser.has_section('cache')
+    if HAS_CACHE:
+        CACHE_DIRECTORY = iniparser.get('cache', 'directory')
+    elif 'CACHE_DIRECTORY' in os.environ:
+        CACHE_DIRECTORY = os.environ['CACHE_DIRECTORY']
+
+
     ONTOLOGY_CONFIG = configparser.ConfigParser()
     ONTOLOGY_CONFIG.read(file_or_resource('ontology_config.ini'))
     HPO_DIRECTORY = '%s/hpo'%CACHE_DIRECTORY
