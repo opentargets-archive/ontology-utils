@@ -46,50 +46,50 @@ class Ontology(object):
         return data      
      
     def loadOBOOntology(self, filename):
-        #oboFile = open('C:\Users\gk680303\Documents\ontologies\hp.obo','r')
-        oboFile = open(filename, mode='rt', encoding='utf-8')
-        #skip the file header lines
-        self.getTerm(oboFile)
 
-        #infinite loop to go through the obo file.
-        #Breaks when the term returned is empty, indicating end of file
-        while 1:
-          #get the term using the two parsing functions
-          term = self.parseTagValue(self.getTerm(oboFile))
-          if len(term) != 0:
-            termID = term['id'][0];
+        with open(filename, mode='rt', encoding='utf-8') as oboFile:
+            #skip the file header lines
+            self.getTerm(oboFile)
 
-            #only add to the structure if the term has a is_a tag
-            #the is_a value contain GOID and term definition
-            #we only want the GOID
-            if 'is_a' in term.keys():
-              termParents = [p.split()[0] for p in term['is_a']]
+            #infinite loop to go through the obo file.
+            #Breaks when the term returned is empty, indicating end of file
+            while 1:
+              #get the term using the two parsing functions
+              term = self.parseTagValue(self.getTerm(oboFile))
+              if len(term) != 0:
+                termID = term['id'][0];
 
-              if termID not in self.terms.keys():
-                #each goid will have two arrays of parents and children
-                self.terms[termID] = {'p':[],'c':[], 'tags':term}
-                # reverse dictionnary from xref to term
-                if 'hasDbXref' in term:
-                    for xref in term['hasDbXref']:
-                        #print " add xref [{0}] ==> {1}\n".format(xref, termID)
-                        if not xref in self.dbxrefs:
-                            self.dbxrefs[xref] = []
-                        self.dbxrefs[xref].append(termID)
-                if 'alt_id' in term:
-                  for alt_id in term['alt_id']:
-                    self.altids[alt_id] = termID
-              elif not 'tags' in self.terms[termID]:
-                self.terms[termID]['tags'] = term
-              #append parents of the current term
-              self.terms[termID]['p'] = termParents
+                #only add to the structure if the term has a is_a tag
+                #the is_a value contain GOID and term definition
+                #we only want the GOID
+                if 'is_a' in term.keys():
+                  termParents = [p.split()[0] for p in term['is_a']]
 
-              #for every parent term, add this current term as children
-              for termParent in termParents:
-                if termParent not in self.terms.keys():
-                  self.terms[termParent] = {'p':[],'c':[]}
-                self.terms[termParent]['c'].append(termID)
-          else:
-            break    
+                  if termID not in self.terms.keys():
+                    #each goid will have two arrays of parents and children
+                    self.terms[termID] = {'p':[],'c':[], 'tags':term}
+                    # reverse dictionnary from xref to term
+                    if 'hasDbXref' in term:
+                        for xref in term['hasDbXref']:
+                            #print " add xref [{0}] ==> {1}\n".format(xref, termID)
+                            if not xref in self.dbxrefs:
+                                self.dbxrefs[xref] = []
+                            self.dbxrefs[xref].append(termID)
+                    if 'alt_id' in term:
+                      for alt_id in term['alt_id']:
+                        self.altids[alt_id] = termID
+                  elif not 'tags' in self.terms[termID]:
+                    self.terms[termID]['tags'] = term
+                  #append parents of the current term
+                  self.terms[termID]['p'] = termParents
+
+                  #for every parent term, add this current term as children
+                  for termParent in termParents:
+                    if termParent not in self.terms.keys():
+                      self.terms[termParent] = {'p':[],'c':[]}
+                    self.terms[termParent]['c'].append(termID)
+              else:
+                break
 
     def getTermsByDbXref(self, xref):
         result = None
