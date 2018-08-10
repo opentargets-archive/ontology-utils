@@ -60,6 +60,10 @@ class OXO():
             pprint(rsp)
             return None
 
+        # totalElements will give the number of elements per page
+        if rsp['page']['totalElements'] == 0:
+            return results
+
         if nbPages == 0:
             nbPages = rsp['page']['totalPages']
 
