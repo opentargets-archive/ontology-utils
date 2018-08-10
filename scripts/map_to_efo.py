@@ -44,7 +44,7 @@ def main():
 
     for term in terms:
         print(term)
-        results = ontology_mapper.getLabelMappings(label=term, targets=[ols.SOURCES['efo'], ols.SOURCES['hp'], ols.SOURCES['mondo']])
+        results = ontology_mapper.get_label_mappings(label=term, targets=[ols.SOURCES['efo'], ols.SOURCES['hp'], ols.SOURCES['mondo']])
         if len(results) == 0:
             print("NO MAPPING FOUND for %s"%(term))
         else:
@@ -60,16 +60,15 @@ def main():
         'C537734'
     ]
     for mesh_id in mesh_ids:
-        results = ontology_mapper.getOboIdMappings(obo_id='MeSH:'+ mesh_id,
-                                                   targets=[oxo.SOURCES['efo'], oxo.SOURCES['orphanet']])
+        results = ontology_mapper.get_obo_id_mappings(obo_id='MeSH:' + mesh_id,
+                                                      targets=[oxo.SOURCES['efo'], oxo.SOURCES['orphanet']])
         pprint(results)
 
     final_mappings = dict()
     for mesh_id in mesh_ids:
         print(mesh_id)
-        curie = oxo.SOURCES['mesh'] + ':' + mesh_id
         oxo_mapper = oxo.OXO()
-        final_mappings[mesh_id] = oxo_mapper.map_to_efo(source=oxo.SOURCES['mesh'], source_id=mesh_id)
+        final_mappings[mesh_id] = ontology_mapper.get_full_ontology_mappings(source=oxo.SOURCES['mesh'], source_id=mesh_id, stop_dests=[oxo.SOURCES['efo']])
 
     icd10_codes = [
         'G20',
@@ -85,33 +84,8 @@ def main():
     final_mappings = dict()
 
     for icd10_code in icd10_codes:
-        curie = oxo.SOURCES['icd10'] + ':' + icd10_code
         oxo_mapper = oxo.OXO()
-        oxo_mapper.oxo_scan(curies=[curie])
-        if oxo.SOURCES['icd10'] in oxo_mapper.oxo_source_to_dest:
-            paths = oxo_mapper.oxo_paths(source=oxo.SOURCES['icd10'], stop_dest=oxo.SOURCES['efo'], curie=curie)
-            # create a list of all the end nodes
-            for path in paths:
-                result_paths = map(lambda x: "%s (%s)" % (x, oxo_mapper.oxo_labels[x]), path)
-                print(" -> ".join(result_paths))
-                if path[-1].startswith(oxo.SOURCES['efo']) or path[-1].startswith(oxo.SOURCES['hp']) or path[-1].startswith(oxo.SOURCES['mp']):
-                    (source, raw) = path[-1].split(":")
-                    id = path[-1]
-                    final_mappings[icd10_code][id] = dict(
-                        id=id,
-                        label=oxo_mapper.oxo_labels[id],
-                        source=" -> ".join(result_paths),
-                        process='oXo shortest path'
-                    )
-
-        else:
-            final_mappings[icd10_code][icd10_code] = dict(
-                id=icd10_code,
-                label='N/A',
-                source=oxo.SOURCES['icd10'],
-                process="Curation Required"
-            )
-
+        final_mappings[icd10_code] = ontology_mapper.get_full_ontology_mappings(source=oxo.SOURCES['mesh'], source_id=mesh_id, stop_dests=[oxo.SOURCES['efo']])
 
 if __name__ == "__main__":
     main()

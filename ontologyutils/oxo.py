@@ -35,7 +35,7 @@ class OXO():
         self.path_nodes = set()
         self.path_sources = set()
 
-    def getSelf(self, obo_id):
+    def get_self_oxo_term(self, obo_id):
 
         url = BASE_URL + '/terms/' + obo_id
         r = requests.get(url, timeout=30)
@@ -49,7 +49,7 @@ class OXO():
             return None
         return rsp
 
-    def queryByOboId(self, obo_id, targets=[SOURCES['efo']]):
+    def query_by_obo_id(self, obo_id, stop_dests=[SOURCES['efo']]):
 
         results = []
         url = BASE_URL + '/mappings'
@@ -75,7 +75,7 @@ class OXO():
 
         for mapping in rsp['_embedded']['mappings']:
             print(mapping['sourcePrefix'])
-            if mapping['datasource']['prefix'] in targets:
+            if mapping['datasource']['prefix'] in stop_dests:
                 mapped_id = mapping['fromTerm']['curie']
                 mapped_label = mapping['fromTerm']['label']
                 if mapping['fromTerm']['curie'] == obo_id:
@@ -89,36 +89,6 @@ class OXO():
                                     tool='OXO'))
 
         return results
-
-    def map_to_efo(self, source, source_id, stop_dest=SOURCES['efo']):
-        final_mappings = dict()
-        curie = source + ':' + source_id
-        self.oxo_scan(curies=[curie])
-        if source in self.oxo_source_to_dest:
-            paths = self.oxo_paths(source=source, stop_dest=stop_dest, curie=curie)
-            # create a list of all the end nodes
-            for path in paths:
-                result_paths = map(lambda x: "%s (%s)" % (x, self.oxo_labels[x]), path)
-                print(" -> ".join(result_paths))
-                if path[-1].startswith(SOURCES['efo']) or path[-1].startswith(SOURCES['hp']) or path[
-                    -1].startswith(SOURCES['mp']):
-                    (source, raw) = path[-1].split(":")
-                    id = path[-1]
-                    final_mappings[id] = dict(
-                        id=id,
-                        label=self.oxo_labels[id],
-                        source=" -> ".join(result_paths),
-                        process='oXo shortest path'
-                    )
-
-        else:
-            final_mappings[source_id] = dict(
-                id=source_id,
-                label='N/A',
-                source=source,
-                process="Curation Required"
-            )
-        return final_mappings
 
     def oxo_mapping_from(self, curie, stop_dests=None, dead_ends=None):
         # https://www.ebi.ac.uk/spot/oxo/api/mappings?fromId=UMLS:C0002191
@@ -217,17 +187,26 @@ class OXO():
 
         return endpoints
 
-    def oxo_scan(self, curies=["ICD10CM:I11"], stop_dests=[SOURCES['efo'], SOURCES['mp'], SOURCES['hp']], dead_ends=[SOURCES['orphanet'], SOURCES['omim']]):
+    def oxo_scan(self, curies=["ICD10CM:I11"], stop_dests=[SOURCES['efo'], SOURCES['mp'], SOURCES['hp'], SOURCES['mondo']], dead_ends=[SOURCES['orphanet'], SOURCES['omim']]):
 
         if self.oxo_stop_node is None:
             for curie in curies:
                 # check we have not been there before
                 if self.oxo_stop_node is None and curie not in self.oxo_nodes:
+                    '''
+                    Add the nodes to the graph if not seen before
+                    '''
                     self.oxo_nodes.add(curie)
+                    '''
+                    get all direct neighbours
+                    '''
                     new_curies = self.oxo_mapping_from(curie=curie, stop_dests=stop_dests, dead_ends=dead_ends)
+                    '''
+                    and iterate for the neighbours until you are in a dead end or to the destination
+                    '''
                     self.oxo_scan(curies=new_curies, stop_dests=stop_dests, dead_ends=dead_ends)
 
-    def oxo_paths(self, source="ICD10CM", stop_dest=None, curie=None, paths=[], reset=True, tabs=""):
+    def oxo_paths(self, source=None, stop_dests=None, curie=None, paths=[], reset=True, tabs=""):
 
         '''
         How this works:
@@ -254,7 +233,7 @@ class OXO():
         # don't want to loop over the same source again
         self.path_sources.add(source)
 
-        # these are the resulting paths
+        # these are the resulting paths for this call
         inter_paths = []
 
         # check that we don't get there again, only add nodes that we have not seen before
@@ -264,12 +243,12 @@ class OXO():
             # if there is nothing in the path create a new path
             if len(paths) == 0:
                 paths = [[]]
-            # and add the current node to all paths
+            # and add the current node to all existing paths
             for idx, val in enumerate(paths):
                 paths[idx].append(curie)
                 # print tabs + "Adding " + " -> ".join(paths[idx])
             # ok, if there is no stop destination or the source is not the stop destination, carry on
-            if stop_dest is not None and source == stop_dest:
+            if stop_dests is not None and source in stop_dests:
                 # print tabs + "I'm done and I'll return all the paths %i" % len(paths)
                 return list(paths)
             elif source in self.oxo_source_to_dest:
@@ -284,7 +263,7 @@ class OXO():
                         for end_curie in records[curie]:
                             # print tabs + "Found new edge from %s to %s (%s)" % (source, dest, end_curie)
                             # deep copy
-                            new_paths = self.oxo_paths(source=dest, stop_dest=stop_dest, curie=end_curie,
+                            new_paths = self.oxo_paths(source=dest, stop_dests=stop_dests, curie=end_curie,
                                                        paths=copy.deepcopy(paths), reset=False, tabs=tabs + "\t")
                             # print tabs + "Return %i path(s)" %len(new_paths)
                             if len(new_paths) > 0:
