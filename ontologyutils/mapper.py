@@ -28,9 +28,13 @@ class OntologyMapper():
         self.ols_mapper = ols.OLS()
         self.zooma_mapper = zooma.Zooma()
         self.oxo_mapper = oxo.OXO()
+        self.dead_ends = dict()
+        self.dead_ends[oxo.SOURCES['efo']] = [SOURCES['orphanet'], SOURCES['omim']]
         self.oxo_mapped_ontology_prefix = dict()
         self.oxo_mapped_ontology_prefix[oxo.SOURCES['efo']] = [oxo.SOURCES['efo'], oxo.SOURCES['hp'], oxo.SOURCES['mp'], oxo.SOURCES['go']]
         self.oxo_mapped_ontology_prefix[oxo.SOURCES['mondo']] = [oxo.SOURCES['mondo']]
+
+
 
     def get_obo_id_mappings(self, obo_id, targets=[oxo.SOURCES['efo']]):
         return self.oxo_mapper.query_by_obo_id(obo_id=obo_id, stop_dests=targets)
@@ -57,7 +61,7 @@ class OntologyMapper():
                     break
         return results
 
-    def get_full_ontology_mappings(self, source, source_id, stop_dests=[oxo.SOURCES['efo']]):
+    def get_full_ontology_mappings(self, source, source_id, stop_dests=[oxo.SOURCES['efo']], dead_ends=None):
 
         final_mappings = dict()
         final_ontology_prefix = set()
@@ -71,7 +75,7 @@ class OntologyMapper():
         This step essentially computes a graph of all relationships between the source uri and the destination uri
         and iterate until there is a stop dest
         '''
-        self.oxo_mapper.oxo_scan(curies=[curie], stop_dests=stop_dests)
+        self.oxo_mapper.oxo_scan(curies=[curie], stop_dests=stop_dests, dead_ends=dead_ends)
         '''
         once this is done, this algorithm starts from the source ontology and create all the paths to the destination 
         ontologies

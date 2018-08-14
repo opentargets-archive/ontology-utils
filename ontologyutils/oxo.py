@@ -1,3 +1,20 @@
+'''
+Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
+
+This software was developed as part of the Open Targets project. For more information please see: http://www.opentargets.org
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+'''
 import requests
 import re
 import copy
@@ -18,6 +35,8 @@ SOURCES = dict(
     icd10='ICD10CM',
     mesh='MeSH'
 )
+
+STREAM_THRESHOLD = 20
 
 __author__ = 'gautierk'
 
@@ -115,6 +134,7 @@ class OXO():
                     # "DATABASE"
                     source_type = mapping['sourceType']
                     # "sourcePrefix" "UMLS"
+
                     # fromTerm
                     source_curie = mapping["fromTerm"]["curie"]
                     source_label = mapping["fromTerm"]["label"]
@@ -129,22 +149,27 @@ class OXO():
                     ecm = re.match("^([^:]+):.*", end_curie)
                     end_prefix = ecm.groups()[0]
                     self.oxo_sources.add(end_prefix)
+
                     # end_prefix = mapping["toTerm"]["datasource"]["prefix"]
                     #
 
+                    # if we have never seen this end prefix before
                     if end_prefix not in self.oxo_source_to_dest:
                         self.oxo_source_to_dest[end_prefix] = dict()
                     if source_prefix not in self.oxo_source_to_dest[end_prefix]:
                         self.oxo_source_to_dest[end_prefix][source_prefix] = dict()
 
+                    # and conversely
                     if source_prefix not in self.oxo_source_to_dest:
                         self.oxo_source_to_dest[source_prefix] = dict()
                     if end_prefix not in self.oxo_source_to_dest[source_prefix]:
                         self.oxo_source_to_dest[source_prefix][end_prefix] = dict()
 
+                    # add the source node
                     if source_curie not in self.oxo_source_to_dest[source_prefix][end_prefix]:
                         self.oxo_source_to_dest[source_prefix][end_prefix][source_curie] = set()
 
+                    # add the end node
                     if end_curie not in self.oxo_source_to_dest[end_prefix][source_prefix]:
                         self.oxo_source_to_dest[end_prefix][source_prefix][end_curie] = set()
 
@@ -152,16 +177,20 @@ class OXO():
                     # if end_curie not in self.oxo_source_to_dest[source_prefix][end_prefix][source_curie] or source_curie not in self.oxo_source_to_dest[end_prefix][source_prefix][end_curie]:
                     #    print ("from %s '%s' (%s) to %s '%s' (%s)" % (source_curie, source_label, source_prefix, end_curie, end_label, end_prefix))
 
+                    #  add the edge between source and end nodes
                     if end_curie not in self.oxo_source_to_dest[source_prefix][end_prefix][source_curie]:
                         self.oxo_source_to_dest[source_prefix][end_prefix][source_curie].add(end_curie)
 
+                    #  add the edge between end and source nodes
                     if source_curie not in self.oxo_source_to_dest[end_prefix][source_prefix][end_curie]:
                         self.oxo_source_to_dest[end_prefix][source_prefix][end_curie].add(source_curie)
 
-                    # dead_end: we don't want to go further
-                    if source_curie != curie and source_prefix in dead_ends or end_curie != curie and end_prefix in dead_ends:
+                    # dead_end: we don't want to go further after having added the node in the graph
+                    if (source_curie != curie and source_prefix in dead_ends and source_prefix not in stop_dests) or \
+                            (end_curie != curie and end_prefix in dead_ends and end_prefix not in stop_dests):
                         continue
 
+                    # however if the node is one of the type we expect
                     if source_curie != curie and source_prefix in stop_dests:
                         print("%s in STOP DEST" % source_curie)
                         self.oxo_stop_node = source_curie
@@ -172,7 +201,7 @@ class OXO():
                         self.oxo_stop_node = end_curie
                         return []
 
-                    # We cut the graph is there are two many paths
+                    # We cut the graph is there are too many paths
                     if (source_curie != curie and source_curie not in self.oxo_nodes) and (
                             source_prefix not in stop_dests or len(
                             self.oxo_source_to_dest[end_prefix][source_prefix]) < STREAM_THRESHOLD):
