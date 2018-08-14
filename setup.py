@@ -34,8 +34,7 @@ setup(
     url="https://github.com/opentargets",
     packages=["ontologyutils"],
     install_requires=[
-        'requests',
-        'configparser'
+        'requests'
       ],
     license="Apache2",
     classifiers=[
