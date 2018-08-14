@@ -29,7 +29,7 @@ class OntologyMapper():
         self.zooma_mapper = zooma.Zooma()
         self.oxo_mapper = oxo.OXO()
         self.dead_ends = dict()
-        self.dead_ends[oxo.SOURCES['efo']] = [SOURCES['orphanet'], SOURCES['omim']]
+        self.dead_ends[oxo.SOURCES['efo']] = [oxo.SOURCES['orphanet'], oxo.SOURCES['omim']]
         self.oxo_mapped_ontology_prefix = dict()
         self.oxo_mapped_ontology_prefix[oxo.SOURCES['efo']] = [oxo.SOURCES['efo'], oxo.SOURCES['hp'], oxo.SOURCES['mp'], oxo.SOURCES['go']]
         self.oxo_mapped_ontology_prefix[oxo.SOURCES['mondo']] = [oxo.SOURCES['mondo']]
