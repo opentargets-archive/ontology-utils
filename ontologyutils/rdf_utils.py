@@ -14,12 +14,12 @@ import json
 import rdflib
 import requests
 from rdflib import URIRef
-from rdflib.namespace import Namespace, NamespaceManager
-from rdflib.namespace import OWL, RDF, RDFS
+from rdflib.namespace import Namespace
+from rdflib.namespace import RDF, RDFS
 from SPARQLWrapper import SPARQLWrapper, JSON
 from tqdm import tqdm
 from datetime import date
-from ou_settings import Config
+from ontologyutils.ou_settings import Config
 
 
 __copyright__ = "Copyright 2014-2018, Open Targets"

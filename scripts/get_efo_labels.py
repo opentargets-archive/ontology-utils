@@ -1,11 +1,10 @@
-import sys
 import csv
 import optparse
 import json
 import logging
 import ontologyutils as onto
 import ontologyutils.efo as efo
-from ou_settings import Config
+from ontologyutils.ou_settings import Config
 
 
 def main():

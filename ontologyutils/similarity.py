@@ -4,9 +4,6 @@ import math
 import operator
 import json
 import numpy as np
-import StringIO
-from ou_settings import Config
-
 
 __author__ = 'gautierk'
 

@@ -23,8 +23,8 @@ from __future__ import absolute_import, print_function
 from nose.tools.nontrivial import with_setup
 from ontologyutils.rdf_utils import OntologyClassReader, PhenotypeSlim, DiseaseUtils, EFO_TAS
 from rdflib import URIRef
-from SPARQLWrapper import SPARQLWrapper, JSON
-from ou_settings import Config
+from SPARQLWrapper import SPARQLWrapper
+from ontologyutils.ou_settings import Config
 import logging
 import os
 

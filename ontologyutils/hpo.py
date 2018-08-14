@@ -3,7 +3,7 @@ import os
 import urllib2
 import logging
 from datetime import datetime
-from ou_settings import Config
+from ontologyutils.ou_settings import Config
 
 __author__ = 'gautierk'
 

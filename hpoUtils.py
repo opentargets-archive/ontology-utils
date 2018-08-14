@@ -1,22 +1,11 @@
-import os
-import httplib
-import time
 import json
-import re
 import sys
 #reload(sys)
 #sys.setdefaultencoding("utf8");
-import datetime
 import optparse
 import logging
-import hashlib
-import ontologyutils as onto
-from ontologyutils.similarity import OntologyLookup, PhenotypeLookup, Diseases
-import numpy
-import math
-import operator
-from functools import partial
-from ou_settings import Config
+from ontologyutils.similarity import PhenotypeLookup, Diseases
+from ontologyutils.ou_settings import Config
 
 hpo = None
 ICs = dict()

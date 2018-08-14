@@ -1,7 +1,4 @@
-from ou_settings import Config
-from ontologyutils.hpo import HPODownloader
 from ontologyutils.efo import EFODownloader
-import logging
 
 __copyright__ = "Copyright 2014-2018, Open Targets"
 __credits__ = ["Gautier Koscielny"]
