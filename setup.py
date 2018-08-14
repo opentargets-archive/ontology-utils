@@ -6,7 +6,7 @@ try:
 except ImportError:
     from distutils import setup
 
-long_description = open(os.path.join(os.path.dirname(__file__), "README.rst")).read()
+long_description = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
 
 setup(
     name="ontologyutils",
