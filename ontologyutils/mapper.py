@@ -85,7 +85,7 @@ class OntologyMapper():
                 '''
                 this part should be improved with a lambda expression but also stop at the stop_dests which is not in the path
                 '''
-                if any(path[-1].startswith(prefix) for prefix in final_ontology_prefix)
+                if any(path[-1].startswith(prefix) for prefix in final_ontology_prefix):
                         #path[-1].startswith(oxo.SOURCES['efo']) or path[-1].startswith(oxo.SOURCES['hp']) or path[-1].startswith(oxo.SOURCES['mp']):
                     (source, raw) = path[-1].split(":")
                     id = path[-1]
