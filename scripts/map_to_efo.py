@@ -21,8 +21,6 @@ def main():
     
     ontology_mapper = mapper.OntologyMapper()
 
-
-
     terms = [
         'Acne',
         'Alzheimer Disease',
@@ -68,7 +66,7 @@ def main():
     for mesh_id in mesh_ids:
         print(mesh_id)
         oxo_mapper = oxo.OXO()
-        final_mappings[mesh_id] = ontology_mapper.get_full_ontology_mappings(source=oxo.SOURCES['mesh'], source_id=mesh_id, stop_dests=[oxo.SOURCES['efo']])
+        final_mappings[mesh_id] = ontology_mapper.get_full_ontology_mappings(source=oxo.SOURCES['mesh'], source_id=mesh_id, stop_dests=[oxo.SOURCES['efo']], dead_ends=ontology_mapper.dead_ends[oxo.SOURCES['efo']])
 
     icd10_codes = [
         'G20',
