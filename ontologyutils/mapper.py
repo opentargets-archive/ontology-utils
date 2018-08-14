@@ -11,6 +11,9 @@ class OntologyMapper():
         self.ols_mapper = ols.OLS()
         self.zooma_mapper = zooma.Zooma()
         self.oxo_mapper = oxo.OXO()
+        self.oxo_mapped_ontology_prefix = dict()
+        self.oxo_mapped_ontology_prefix[oxo.SOURCES['efo']] = [oxo.SOURCES['efo'], oxo.SOURCES['hp'], oxo.SOURCES['mp'], oxo.SOURCES['go']]
+        self.oxo_mapped_ontology_prefix[oxo.SOURCES['mondo']] = [oxo.SOURCES['mondo']]
 
     def get_obo_id_mappings(self, obo_id, targets=[oxo.SOURCES['efo']]):
         return self.oxo_mapper.query_by_obo_id(obo_id=obo_id, stop_dests=targets)
@@ -40,6 +43,9 @@ class OntologyMapper():
     def get_full_ontology_mappings(self, source, source_id, stop_dests=[oxo.SOURCES['efo']]):
 
         final_mappings = dict()
+        final_ontology_prefix = set()
+        for stop_dest in stop_dests:
+            final_ontology_prefix |= set(self.oxo_mapped_ontology_prefix(stop_dest))
 
         self.oxo_mapper = oxo.OXO()
         
@@ -62,7 +68,8 @@ class OntologyMapper():
                 '''
                 this part should be improved with a lambda expression but also stop at the stop_dests which is not in the path
                 '''
-                if path[-1].startswith(oxo.SOURCES['efo']) or path[-1].startswith(oxo.SOURCES['hp']) or path[-1].startswith(oxo.SOURCES['mp']):
+                if any(path[-1].startswith(prefix) for prefix in final_ontology_prefix)
+                        #path[-1].startswith(oxo.SOURCES['efo']) or path[-1].startswith(oxo.SOURCES['hp']) or path[-1].startswith(oxo.SOURCES['mp']):
                     (source, raw) = path[-1].split(":")
                     id = path[-1]
                     final_mappings[id] = dict(
