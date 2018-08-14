@@ -47,7 +47,7 @@ class OntologyMapper():
             if result:
                 results.append(dict(scope='EXACT',
                                     source=ontology_name,
-                                    id=result['id'],
+                                    id=result['obo_id'],
                                     label=result['label'],
                                     tool='OLS'))
                 break

@@ -60,8 +60,9 @@ class EFOUtils():
             return 'http://www.orpha.net/ORDO/' + base_code
         elif "EFO_" in base_code:
             return 'http://www.ebi.ac.uk/efo/' + base_code
-        elif "GO_" in base_code or "HP_" in base_code or "DOID_" in base_code or "MP_" in base_code or "OBI_" in base_code:
+        elif "GO_" in base_code or "HP_" in base_code or "DOID_" in base_code or "MP_" in base_code or "OBI_" in base_code or "MONDO_" in base_code:
             # http://purl.obolibrary.org/obo/
+            # http://purl.obolibrary.org/obo/MONDO_0012275
             return "http://purl.obolibrary.org/obo/" + base_code
         else:
             print("Unknown code!!! %s" %(id))
