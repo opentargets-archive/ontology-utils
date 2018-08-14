@@ -62,7 +62,7 @@ class OntologyMapper():
         final_mappings = dict()
         final_ontology_prefix = set()
         for stop_dest in stop_dests:
-            final_ontology_prefix |= set(self.oxo_mapped_ontology_prefix(stop_dest))
+            final_ontology_prefix |= set(self.oxo_mapped_ontology_prefix[stop_dest])
 
         self.oxo_mapper = oxo.OXO()
         
