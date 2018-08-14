@@ -6,6 +6,7 @@ from pprint import pprint
 
 SOURCES = dict(
     efo='EFO',
+    go='GO',
     umls='UMLS',
     mp='MP',
     hp='HP',
