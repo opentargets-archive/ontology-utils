@@ -46,7 +46,7 @@ class OntologyMapper():
             result = self.ols_mapper.queryByLabelOrSynonym(label=label, ontology_name=ontology_name)
             if result:
                 results.append(dict(scope='EXACT',
-                                    source=ontology_name,
+                                    source=ontology_name.upper(),
                                     id=result['obo_id'],
                                     label=result['label'],
                                     tool='OLS'))
@@ -55,14 +55,14 @@ class OntologyMapper():
                 result = self.zooma_mapper.getHighMediumConfidenceMapping(label=label, ontology_name=ontology_name)
                 if result:
                     results.append(dict(scope='EXACT',
-                                        source=ontology_name,
+                                        source=ontology_name.upper(),
                                         id=result['obo_id'],
                                         label=result['label'],
                                         tool='ZOOMA'))
                     break
         return results
 
-    def get_full_ontology_mappings(self, source, source_id, stop_dests=[oxo.SOURCES['efo']], dead_ends=None):
+    def get_full_ontology_mappings(self, source, source_id, stop_dests=[oxo.SOURCES['efo']], dead_ends=[]):
 
         final_mappings = dict()
         final_ontology_prefix = set()

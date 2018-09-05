@@ -62,11 +62,13 @@ class Config():
     elif 'HTTP_PROXY' in os.environ:
         PROXY = os.environ['HTTP_PROXY']
 
+    CACHE_DIRECTORY = ''
+
     HAS_CACHE = iniparser.has_section('cache')
     if HAS_CACHE:
         CACHE_DIRECTORY = iniparser.get('cache', 'directory')
-    elif 'CACHE_DIRECTORY' in os.environ:
-        CACHE_DIRECTORY = os.environ['CACHE_DIRECTORY']
+    elif 'ONTOLOGYUTILS_CACHE' in os.environ:
+        CACHE_DIRECTORY = os.environ['ONTOLOGYUTILS_CACHE']
 
 
     ONTOLOGY_CONFIG = configparser.ConfigParser()
