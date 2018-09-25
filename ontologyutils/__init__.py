@@ -1,7 +1,7 @@
+from builtins import object
 import re
 import sys
-#reload(sys);
-#sys.setdefaultencoding("utf8");
+import io
 
 class Ontology(object):
     def __init__(self):
@@ -38,7 +38,7 @@ class Ontology(object):
                     #print "{0}\n".format(v.rstrip())
                     value = v.rstrip()
                 
-            if tag not in data.keys():
+            if tag not in list(data.keys()):
                 data[tag] = []
 
             data[tag].append(value)
@@ -47,7 +47,7 @@ class Ontology(object):
      
     def loadOBOOntology(self, filename):
 
-        with open(filename, mode='rt', encoding='utf-8') as oboFile:
+        with io.open(filename, mode='rt', encoding="UTF-8") as oboFile:
             #skip the file header lines
             self.getTerm(oboFile)
 
@@ -62,10 +62,10 @@ class Ontology(object):
                 #only add to the structure if the term has a is_a tag
                 #the is_a value contain GOID and term definition
                 #we only want the GOID
-                if 'is_a' in term.keys():
+                if 'is_a' in list(term.keys()):
                   termParents = [p.split()[0] for p in term['is_a']]
 
-                  if termID not in self.terms.keys():
+                  if termID not in list(self.terms.keys()):
                     #each goid will have two arrays of parents and children
                     self.terms[termID] = {'p':[],'c':[], 'tags':term}
                     # reverse dictionnary from xref to term
@@ -85,7 +85,7 @@ class Ontology(object):
 
                   #for every parent term, add this current term as children
                   for termParent in termParents:
-                    if termParent not in self.terms.keys():
+                    if termParent not in list(self.terms.keys()):
                       self.terms[termParent] = {'p':[],'c':[]}
                     self.terms[termParent]['c'].append(termID)
               else:
@@ -109,7 +109,7 @@ class Ontology(object):
 
     def getDescendents(self, goid):
         recursiveArray = [goid]
-        if self.terms.has_key(goid):
+        if goid in self.terms:
             children = self.terms[goid]['c']
             if len(children) > 0:
               for child in children:

@@ -1,6 +1,10 @@
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import sys
 import requests
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import ontologyutils.efo as efo
 import logging
 import json
@@ -20,7 +24,7 @@ __author__ = 'gautierk'
 
 BASE_URL = 'https://www.ebi.ac.uk/ols/api'
 
-class OLS():
+class OLS(object):
 
     def __init__(self):
         pass

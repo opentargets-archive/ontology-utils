@@ -1,3 +1,8 @@
+from __future__ import division
+from __future__ import print_function
+from builtins import filter
+from past.utils import old_div
+from builtins import object
 import ontologyutils as onto
 import numpy
 import math
@@ -71,7 +76,7 @@ class PhenotypeLookup(OntologyLookup):
                     self.term_to_disease_lookup[ancestor] = []
                     an = list(self.ontology.getAncestors(ancestor))[:]
                     an.remove(ancestor)
-                    print "Adding ancestors %s => %s"%(ancestor, ",".join(an))
+                    print("Adding ancestors %s => %s"%(ancestor, ",".join(an)))
                     self.ancestors[ancestor] = an
 
         for ancestor in ancestors:
@@ -158,7 +163,7 @@ class Diseases(object):
                         else:
                             hpo_id = 'HP:0000001'  # So it's general term with a very low IC
                 else:
-                    print "%s is not an HPO term" % (A[3])
+                    print("%s is not an HPO term" % (A[3]))
                     hpo_id = 'HP:0000001'  # So it's general term with a very low IC
                 # if A[3] == 'HP:0007852':
                 #    print hpo_id
@@ -232,10 +237,10 @@ class Diseases(object):
 
     def list_disease_phenotype(self, disease_id):
         record = self.disease_lookup[disease_id]
-        print record['label']
+        print(record['label'])
         for termId in record['phenotypes']:
-            print "%s" %(self.phenotype_lookup.ontology.terms[termId]['tags']['name'][0])
-        print len(record['phenotypes'])
+            print("%s" %(self.phenotype_lookup.ontology.terms[termId]['tags']['name'][0]))
+        print(len(record['phenotypes']))
 
 
     def compute_ICs(self):
@@ -243,11 +248,11 @@ class Diseases(object):
             self.ICs[phenotype] = self.ic(phenotype)
 
     def ic(self, hpo_id):
-        return -math.log(len(self.phenotype_lookup.term_to_disease_lookup[hpo_id]) / float(self.nb_diseases))
+        return -math.log(old_div(len(self.phenotype_lookup.term_to_disease_lookup[hpo_id]), float(self.nb_diseases)))
 
     def compute_MICAs(self):
 
-        self.phenotype_lookup.sorted_terms = self.phenotype_lookup.term_to_disease_lookup.keys()
+        self.phenotype_lookup.sorted_terms = list(self.phenotype_lookup.term_to_disease_lookup.keys())
         self.phenotype_lookup.sorted_terms.sort()
 
         n = len(self.phenotype_lookup.sorted_terms)
@@ -257,7 +262,7 @@ class Diseases(object):
 
         for termA in self.phenotype_lookup.sorted_terms:
             #l = [0] * n
-            print "A: %s %i %i"%(termA, indexA, n)
+            print("A: %s %i %i"%(termA, indexA, n))
             indexB = 0
             for termB in self.phenotype_lookup.sorted_terms:
                 #print "A: %s B: %s"%(termA, termB)
@@ -274,7 +279,7 @@ class Diseases(object):
                     #print len(self.phenotype_lookup.ancestors[termA])
                     #print ",".join(self.phenotype_lookup.ancestors[termA])
                     common_ancestors = list(set(self.phenotype_lookup.ancestors[termA]).intersection(set(self.phenotype_lookup.ancestors[termB])))
-                    values = list(map(lambda x: self.ICs[x], common_ancestors))
+                    values = list([self.ICs[x] for x in common_ancestors])
                     max_index, max_value = max(enumerate(values), key=operator.itemgetter(1))
                     term = common_ancestors[max_index]
                     ''' we don't want to have phenotypic abnormality
@@ -321,7 +326,7 @@ class Diseases(object):
                 # print "%s %s"%(t,s)
                 common_ancestors = list(set(ancestors[t].intersection(ancestors[s])))
                 # print "%s % s %s"%(s, t, ",".join(common_ancestors))
-                values = list(map(lambda x: ICs[x], common_ancestors))
+                values = list([ICs[x] for x in common_ancestors])
                 # mica = max(ca_ics)
 
                 max_index, max_value = max(enumerate(values), key=operator.itemgetter(1))
@@ -362,7 +367,7 @@ class Diseases(object):
 		:param micas:
 		:return:
 		'''
-        return ",".join(filter(partial(operator.is_not, None), map(lambda x: mica2String(x), micas)))
+        return ",".join(filter(partial(operator.is_not, None), [mica2String(x) for x in micas]))
 
 
 

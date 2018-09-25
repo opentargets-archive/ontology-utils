@@ -1,3 +1,7 @@
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import re
 import os
 import sys
@@ -7,10 +11,10 @@ from ontologyutils.ou_settings import Config
 
 __author__ = 'gautierk'
 
-class EFOActions():
+class EFOActions(object):
     DOWNLOAD='download'
 
-class EFODownloader():
+class EFODownloader(object):
 
     def __init__(self):
         pass
@@ -29,10 +33,10 @@ class EFODownloader():
             filename = re.match("^.+/([^/]+)\?format=raw$", url).groups()[0]
             print(filename)
             # get a new version of EFO
-            req = urllib2.Request(url)
+            req = urllib.request.Request(url)
 
             try:
-                response = urllib2.urlopen(req)
+                response = urllib.request.urlopen(req)
 
                 # Open our local file for writing
                 local_file = open('%s/%s'%(directory, filename), "wb")
@@ -43,12 +47,12 @@ class EFODownloader():
                 logging.info("downloaded %s"%filename)
 
             #handle errors
-            except urllib2.HTTPError as e:
-                print ("HTTP Error:",e.code , url)
-            except urllib2.URLError as e:
-                print ("URL Error:",e.reason , url)
+            except urllib.error.HTTPError as e:
+                print(("HTTP Error:",e.code , url))
+            except urllib.error.URLError as e:
+                print(("URL Error:",e.reason , url))
 
-class EFOUtils():
+class EFOUtils(object):
 
     def __init__(self):
         pass

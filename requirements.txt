@@ -6,3 +6,4 @@ requests
 rdflib
 pysftp
 configparser
+future

@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from builtins import object
 import copy
 import re
 import sys
@@ -220,7 +223,7 @@ def write_superclasses(arg, source_graph):
                 destination_graph.add((node, RDFS.subClassOf, c))
                 yield (c, destination_graph)
 
-class OntologyClassReader():
+class OntologyClassReader(object):
 
     def __init__(self):
         """Initialises the class
@@ -372,11 +375,11 @@ class OntologyClassReader():
         old URI with the latest URI (some intermediate classes can be obsolete too)
         """
 
-        for old_uri, record in self.obsoletes.items():
+        for old_uri, record in list(self.obsoletes.items()):
             if not record['processed']:
                 next_uri = self.obsoletes[old_uri]['new_uri']
                 next_reason = self.obsoletes[old_uri]['reason_for_obsolescence']
-                while next_uri in self.obsoletes.keys():
+                while next_uri in list(self.obsoletes.keys()):
                     prev_uri = next_uri
                     next_uri = self.obsoletes[prev_uri]['new_uri']
                     if next_uri == prev_uri:
@@ -467,7 +470,7 @@ class OntologyClassReader():
     def get_new_from_obsolete_uri(self, old_uri):
 
         next_uri = self.obsoletes[old_uri]['new_uri']
-        while next_uri in self.obsoletes.keys():
+        while next_uri in list(self.obsoletes.keys()):
             next_uri = self.obsoletes[next_uri]['new_uri']
         if next_uri in self.current_classes:
             new_label = self.current_classes[next_uri]
@@ -705,7 +708,7 @@ class OntologyClassReader():
         '''
         Create an other disease node
         '''
-        cttv = Namespace(unicode("http://www.targetvalidation.org/disease"))
+        cttv = Namespace(str("http://www.targetvalidation.org/disease"))
 
         # namespace_manager = NamespaceManager(self.rdf_graph)
         self.rdf_graph.namespace_manager.bind('cttv', cttv)
@@ -763,14 +766,14 @@ class OntologyClassReader():
         self.get_children(phenotypic_abnormality_uri)
 
         for child in self.children[phenotypic_abnormality_uri]:
-            print "%s %s..."%(child['code'], child['label'])
+            print("%s %s..."%(child['code'], child['label']))
             uri = "http://purl.obolibrary.org/obo/" + child['code']
             uriref = URIRef(uri)
             self.rdf_graph.remove((uriref, None, phenotypic_abnormality_uriref))
             self.load_ontology_classes(base_class=uri)
             self.get_classes_paths(root_uri=uri, level=0)
             self.get_deprecated_classes()
-            print len(self.current_classes)
+            print(len(self.current_classes))
 
     def load_mammalian_phenotype_ontology(self):
         """
@@ -792,13 +795,13 @@ class OntologyClassReader():
         self.get_children(mp_root_uri)
 
         for child in self.children[mp_root_uri]:
-            print "%s %s..."%(child['code'], child['label'])
+            print("%s %s..."%(child['code'], child['label']))
             uri = "http://purl.obolibrary.org/obo/" + child['code']
             uriref = URIRef(uri)
             self.rdf_graph.remove((uriref, None, mp_root_uriref))
             self.load_ontology_classes(base_class=uri)
             self.get_classes_paths(root_uri=uri, level=0)
-            print len(self.current_classes)
+            print(len(self.current_classes))
 
     def load_efo_omim_xrefs(self):
         '''
@@ -850,8 +853,8 @@ class OntologyClassReader():
             C) Traverse the graph breadth first
         '''
 
-        cttv = Namespace(unicode("http://www.targetvalidation.org/disease"))
-        ot = Namespace(unicode("http://identifiers.org/eco"))
+        cttv = Namespace(str("http://www.targetvalidation.org/disease"))
+        ot = Namespace(str("http://identifiers.org/eco"))
 
         #namespace_manager = NamespaceManager(self.rdf_graph)
         self.rdf_graph.namespace_manager.bind('cttv', cttv)
@@ -878,7 +881,7 @@ class OntologyClassReader():
             'http://www.targetvalidation.org/provenance/gene_to_disease_association':'gene to disease association'
         }
 
-        for uri, label in open_targets_terms.iteritems():
+        for uri, label in open_targets_terms.items():
             u = URIRef(uri)
             self.rdf_graph.add((u, RDF.type, rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class')))
             self.rdf_graph.add([u, RDFS.label, rdflib.Literal(label)])
@@ -903,7 +906,7 @@ class OntologyClassReader():
             self.load_ontology_classes(base_class=base_class)
             self.get_classes_paths(root_uri=base_class, level=0)
 
-class DiseaseUtils():
+class DiseaseUtils(object):
 
     def __init__(self):
         pass
@@ -912,9 +915,9 @@ class DiseaseUtils():
 
         # get all tas per
         fh = open(filename, 'w')
-        for uri, label in ontologyreader.current_classes.items():
+        for uri, label in list(ontologyreader.current_classes.items()):
             if uri in ontologyreader.classes_paths and uri != "http://www.ebi.ac.uk/efo/EFO_0000408":
-                tas = map(lambda x: x[1]['label'], ontologyreader.classes_paths[uri]['all'])
+                tas = [x[1]['label'] for x in ontologyreader.classes_paths[uri]['all']]
                 fh.write("%s\t%s\t%s\n"%(uri, label, ",".join(set(tas))))
         fh.close()
 
@@ -936,9 +939,9 @@ class DiseaseUtils():
         pmap = self.get_disease_phenotypes(ontologyreader)
 
         fh = open(filename, 'w')
-        for uri, ds in pmap.items():
+        for uri, ds in list(pmap.items()):
             label = ds['label']
-            phenotypes = map(lambda x: x['label'], ds['phenotypes'])
+            phenotypes = [x['label'] for x in ds['phenotypes']]
             fh.write("%s\t%s\t%s\n" % (uri, label, ",".join(set(phenotypes))))
         fh.close()
         '''
@@ -992,14 +995,14 @@ class DiseaseUtils():
             logger.debug("%s (%s) hasPhenotype %s (%s)" % (disease_uri, disease_label, phenotype_uri, phenotype_label))
             if disease_uri not in disease_phenotypes_map:
                 disease_phenotypes_map[disease_uri] = { 'label': disease_label, 'phenotypes': [] }
-            if phenotype_uri not in map(lambda x: x['uri'], disease_phenotypes_map[disease_uri]['phenotypes']):
+            if phenotype_uri not in [x['uri'] for x in disease_phenotypes_map[disease_uri]['phenotypes']]:
                 disease_phenotypes_map[disease_uri]['phenotypes'].append({'label': phenotype_label, 'uri': phenotype_uri})
 
         self.update_disease_phenotypes_cache(disease_phenotypes_map)
 
         return disease_phenotypes_map
 
-class PhenotypeSlim():
+class PhenotypeSlim(object):
 
     def __init__(self):
 
@@ -1177,7 +1180,7 @@ class PhenotypeSlim():
                                            ) as srv:
                         srv.walktree('/', fcallback=self._store_remote_filename, dcallback=self._callback_not_used, ucallback=self._callback_not_used)
                         srv.close()
-                        for datasource, file_data in tqdm(self._remote_filenames[u].items(),
+                        for datasource, file_data in tqdm(list(self._remote_filenames[u].items()),
                                                           desc='scanning available datasource for account %s'%u,
                                                           file=tqdm_out,
                                                           leave=False,):
@@ -1188,7 +1191,7 @@ class PhenotypeSlim():
                 except AuthenticationException:
                     self._logger.error('cannot connect with credentials: user:%s password:%s' % (u, p))
 
-        for uri, p in self.phenotype_map.iteritems():
+        for uri, p in self.phenotype_map.items():
             logger.debug(uri)
             logger.debug(json.dumps(p, indent=2))
 

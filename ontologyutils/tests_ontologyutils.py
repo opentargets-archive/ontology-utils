@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 import os
 import pytest
@@ -21,13 +22,13 @@ print(path + ' --> ' + file + "\n")
 print("This file directory only")
 print(os.path.dirname(full_path))
 
-filename = '../samples/hp.obo'
+filename = 'samples/hp.obo'
 hpo = onto.Ontology.fromOBOFile(filename)
 
 def test_hpoterm_exists():
     # "http://purl.obolibrary.org/obo/HP_0001387"
     # comment;synonym;name;hasDbXref;id;is_a;alt_id;def
-    assert "name" in hpo.terms['HP:0001387']['tags'].keys()
+    assert "name" in list(hpo.terms['HP:0001387']['tags'].keys())
     assert hpo.terms['HP:0001387']['tags']['name'][0] == "Joint stiffness"
     ancestors = hpo.getAncestors('HP:0001387')
     # HP:0011842,HP:0000001,HP:0000118,HP:0000924,HP:0001367,HP:0001376,HP:0011729,HP:0001387
@@ -40,5 +41,5 @@ def test_hpodbxref_exists():
         terms = hpo.getTermsByDbXref(xref)
         assert not terms == None
         for termId in terms:
-            print "{0}: {1}\n".format(xref, ';'.join(hpo.terms[termId]['tags']['name']))
+            print("{0}: {1}\n".format(xref, ';'.join(hpo.terms[termId]['tags']['name'])))
 

@@ -1,7 +1,11 @@
+from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import sys
 import requests
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import ontologyutils.efo as efo
 import ontologyutils.ols as ols
 import logging
@@ -13,7 +17,7 @@ __author__ = 'gautierk'
 BASE_URL = 'https://www.ebi.ac.uk/spot/zooma/v2/api/services'
 #https://www.ebi.ac.uk/spot/zooma/v2/api/services/annotate?propertyValue=mus+musculus&propertyType=organism&filter=required:[none],ontologies:[efo,mirnao]
 
-class Zooma():
+class Zooma(object):
 
     def __init__(self):
         self.ols_mapper = ols.OLS()

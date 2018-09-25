@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
+from __future__ import print_function
+from builtins import object
 import requests
 import re
 import copy
@@ -43,7 +45,7 @@ __author__ = 'gautierk'
 BASE_URL = 'https://www.ebi.ac.uk/spot/oxo/api'
 
 
-class OXO():
+class OXO(object):
 
     def __init__(self):
         self.oxo_source_to_dest = dict()
@@ -284,7 +286,7 @@ class OXO():
             elif source in self.oxo_source_to_dest:
                 # for every destination possible
                 b_new_nodes = 0
-                for dest, records in self.oxo_source_to_dest[source].items():
+                for dest, records in list(self.oxo_source_to_dest[source].items()):
 
                     # looking from source to dest
                     # any dest for which we have a link to

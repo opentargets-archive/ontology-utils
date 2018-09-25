@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
+from __future__ import print_function
+from builtins import object
 import os
 import configparser
 import pkg_resources as res
@@ -48,7 +50,7 @@ env_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'env.ini')
 if os.path.isfile(env_file):
     iniparser.read(env_file)
 
-class Config():
+class Config(object):
     # print "OS SEP %s %s"%(os.sep, os.path.sep)
     HAS_PROXY = iniparser.has_section('proxy')
     if HAS_PROXY:

@@ -89,7 +89,7 @@ def test_load_hpo_classes():
 
     # Display obsolete terms
     logger.info(len(obj.obsolete_classes))
-    for k,v in obj.obsolete_classes.iteritems():
+    for k,v in obj.obsolete_classes.items():
         logger.info("%s => %s "%(k, v))
         assert obj.obsolete_classes[k] == v
 
@@ -118,7 +118,7 @@ def test_load_mp_classes():
 
     # Display obsolete terms
     logger.info(len(obj.obsolete_classes))
-    for k,v in obj.obsolete_classes.iteritems():
+    for k,v in obj.obsolete_classes.items():
         logger.info("%s => %s "%(k, v))
         assert obj.obsolete_classes[k] == v
 
@@ -148,7 +148,7 @@ def test_load_efo_classes():
 
     # Display obsolete terms
     logger.info(len(obj.obsolete_classes))
-    for k,v in obj.obsolete_classes.iteritems():
+    for k,v in obj.obsolete_classes.items():
         logger.info("%s => %s "%(k, v))
         assert obj.obsolete_classes[k] == v
 

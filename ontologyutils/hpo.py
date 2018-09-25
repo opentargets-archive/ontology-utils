@@ -1,16 +1,20 @@
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import re
 import os
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import logging
 from datetime import datetime
 from ontologyutils.ou_settings import Config
 
 __author__ = 'gautierk'
 
-class HPOActions():
+class HPOActions(object):
     DOWNLOAD='download'
 
-class HPODownloader():
+class HPODownloader(object):
 
     def __init__(self):
         pass
@@ -26,19 +30,19 @@ class HPODownloader():
         for url in Config.HPO_URIS:
             directory = Config.HPO_ANNOTATIONS_DIRECTORY
             filename = re.match("^.+/([^/]+)$", url).groups()[0]
-            print url
+            print(url)
             #match = re.match("^.+/([^/]+)$", url)
             if re.match(Config.HPO_OBO_MATCH, url):
                 directory = Config.HPO_OBO_DIRECTORY
             elif re.match(Config.HPO_ANNOTATIONS_MATCH, url):
                 directory = Config.HPO_ANNOTATIONS_DIRECTORY
 
-            print filename
+            print(filename)
             # get a new version of HPO
-            req = urllib2.Request(url)
+            req = urllib.request.Request(url)
 
             try:
-                response = urllib2.urlopen(req)
+                response = urllib.request.urlopen(req)
 
                 # Open our local file for writing
                 local_file = open('%s/%s'%(directory, filename), "wb")
@@ -49,7 +53,7 @@ class HPODownloader():
                 logging.info("downloaded %s"%filename)
 
             #handle errors
-            except urllib2.HTTPError, e:
-                print "HTTP Error:",e.code , url
-            except urllib2.URLError, e:
-                print "URL Error:",e.reason , url
+            except urllib.error.HTTPError as e:
+                print("HTTP Error:",e.code , url)
+            except urllib.error.URLError as e:
+                print("URL Error:",e.reason , url)

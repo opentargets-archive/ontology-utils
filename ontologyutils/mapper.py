@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
+from __future__ import print_function
+from builtins import object
 import ontologyutils.ols as ols
 import ontologyutils.zooma as zooma
 import ontologyutils.oxo as oxo
@@ -22,7 +24,7 @@ import logging
 
 __author__ = 'gautierk'
 
-class OntologyMapper():
+class OntologyMapper(object):
 
     def __init__(self):
         self.ols_mapper = ols.OLS()
@@ -85,7 +87,7 @@ class OntologyMapper():
             paths = self.oxo_mapper.oxo_paths(source=source, stop_dests=stop_dests, curie=curie)
             # create a list of all the end nodes
             for path in paths:
-                result_paths = map(lambda x: "%s (%s)" % (x, self.oxo_mapper.oxo_labels[x]), path)
+                result_paths = ["%s (%s)" % (x, self.oxo_mapper.oxo_labels[x]) for x in path]
                 print(" -> ".join(result_paths))
                 '''
                 this part should be improved with a lambda expression but also stop at the stop_dests which is not in the path
