@@ -9,4 +9,12 @@ jobs:
 
     steps:
       - checkout # check out the code in the project directory
-      - run: pip install tox && tox -r # install and run tox for tests
+      - run: # install and activate virtual environment with pip
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install tox
+      - run: # run tests
+          command: |
+            . venv/bin/activate
+            tox
