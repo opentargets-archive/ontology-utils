@@ -2,7 +2,6 @@ from __future__ import print_function
 import sys
 import os
 import pytest
-sys.path.append('./ontologyutils')
 import ontologyutils as onto
 
 print("Path at terminal when executing this file")
