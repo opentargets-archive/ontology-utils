@@ -1,8 +1,0 @@
-README.rst
-setup.py
-ontologyutils/__init__.py
-ontologyutils/tests_ontologyutils.py
-ontologyutils.egg-info/PKG-INFO
-ontologyutils.egg-info/SOURCES.txt
-ontologyutils.egg-info/dependency_links.txt
-ontologyutils.egg-info/top_level.txt
