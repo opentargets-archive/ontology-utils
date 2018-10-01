@@ -1,8 +1,6 @@
 from __future__ import print_function
 import json
 import sys
-#reload(sys)
-#sys.setdefaultencoding("utf8");
 import optparse
 import logging
 from ontologyutils.similarity import PhenotypeLookup, Diseases
