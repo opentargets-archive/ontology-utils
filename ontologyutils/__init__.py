@@ -1,6 +1,6 @@
 from builtins import object
 import re
-import sys
+import logging
 import json
 import copy
 import io
@@ -14,6 +14,7 @@ class Ontology(object):
         self.altids = dict()
         self.oboNamespace = 'http://purl.obolibrary.org/obo/'
         self.ordoNamespace = 'http://www.orpha.net/ORDO/'
+        self.logger = logging.getLogger(__name__)
 
     @classmethod
     def fromOBOFile(cls, filename):
@@ -86,7 +87,7 @@ class Ontology(object):
                     for property_key in filtered_keys:
 
                         reverse_key = 'r_' + property_key
-                        print('Current term:', termID, property_key)
+                        #print('Current term:', termID, property_key)
 
                         if property_key == 'is_a':
                             termParents = [p.split()[0] for p in term[property_key]]
@@ -150,21 +151,21 @@ class Ontology(object):
         while found_new_node > 0:
             found_new_node = 0
             new_paths = []
-            print('#paths', len(paths))
+            self.logger.debug('#paths', len(paths))
             for path in paths:
-                print(json.dumps(path, indent=2))
+                self.logger.debug(json.dumps(path, indent=2))
                 new_node = path[-1]
                 if new_node not in traversed:
                     found_new_node +=1
                     traversed.add(new_node)
-                    print('-> ', new_node)
+                    self.logger.debug('-> ', new_node)
                     for r_key, r_nodes in self.terms[new_node]['dag'].items():
                         if not r_key.startswith('r_'):
                             for r_node_id in r_nodes:
                                 new_path = copy.copy(path)
                                 new_path.extend([r_key, r_node_id])
-                                print('Add ', r_key, r_node_id)
-                                print(json.dumps(new_path, indent=2))
+                                self.logger.debug('Add ', r_key, r_node_id)
+                                self.logger.debug(json.dumps(new_path, indent=2))
                                 new_paths.append(new_path)
                 else:
                     new_paths.append(path)

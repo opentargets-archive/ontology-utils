@@ -26,7 +26,7 @@ long_description = open(os.path.join(os.path.dirname(__file__), "README.md")).re
 
 setup(
     name="ontologyutils",
-    version="0.3",
+    version="0.4",
     description=long_description.split("\n")[0],
     long_description=long_description,
     author="Gautier Koscielny",

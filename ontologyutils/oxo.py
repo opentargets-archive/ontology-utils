@@ -56,18 +56,17 @@ class OXO(object):
         # for shortest paths
         self.path_nodes = set()
         self.path_sources = set()
+        self.logger = logging.getLogger(__name__)
 
     def get_self_oxo_term(self, obo_id):
 
         url = BASE_URL + '/terms/' + obo_id
         r = requests.get(url, timeout=30)
-        print(r.url)
+        self.logger.debug(r.url)
         if r.status_code == 404:
             return None
         rsp = r.json()
-        pprint(rsp)
         if 'error' in rsp:
-            pprint(rsp)
             return None
         return rsp
 
@@ -79,13 +78,11 @@ class OXO(object):
 
         params = dict(fromId=obo_id, size=20)
         r = requests.get(url, params=params, timeout=30)
-        print(r.url)
+        self.logger.debug(r.url)
         if r.status_code == 404:
             return None
         rsp = r.json()
-        # pprint(rsp)
         if 'error' in rsp:
-            pprint(rsp)
             return None
 
         # totalElements will give the number of elements per page
@@ -96,7 +93,7 @@ class OXO(object):
             nbPages = rsp['page']['totalPages']
 
         for mapping in rsp['_embedded']['mappings']:
-            print(mapping['sourcePrefix'])
+            self.logger.debug(mapping['sourcePrefix'])
             if mapping['datasource']['prefix'] in stop_dests:
                 mapped_id = mapping['fromTerm']['curie']
                 mapped_label = mapping['fromTerm']['label']
@@ -126,12 +123,12 @@ class OXO(object):
 
             params = dict(fromId=curie, page=i)
             r = requests.get(url, params=params, timeout=30)
-            print(r.url)
+            self.logger.debug(r.url)
             results = r.json()
             i += 1
 
             if results["page"]["totalElements"] > 0:
-                # print(json.dumps(results, indent=2))
+                # self.logger.debug(json.dumps(results, indent=2))
                 for mapping in results["_embedded"]["mappings"]:
                     # "DATABASE"
                     source_type = mapping['sourceType']
@@ -194,12 +191,12 @@ class OXO(object):
 
                     # however if the node is one of the type we expect
                     if source_curie != curie and source_prefix in stop_dests:
-                        print("%s in STOP DEST" % source_curie)
+                        self.logger.debug("%s in STOP DEST" % source_curie)
                         self.oxo_stop_node = source_curie
                         return []
 
                     if end_curie != curie and end_prefix in stop_dests:
-                        print("%s in STOP DEST" % end_curie)
+                        self.logger.debug("%s in STOP DEST" % end_curie)
                         self.oxo_stop_node = end_curie
                         return []
 

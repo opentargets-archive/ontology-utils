@@ -27,18 +27,18 @@ BASE_URL = 'https://www.ebi.ac.uk/ols/api'
 class OLS(object):
 
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
 
     def queryByIRI(self, id_uri, ontology_name):
 
         url = BASE_URL + '/ontologies/' + ontology_name + '/terms/' + urllib.parse.quote_plus(id_uri).replace('%2F', '%252F')
         r = requests.get(url, timeout=30)
-        print(r.url)
+        self.logger.debug(r.url)
         if r.status_code == 404:
             return None
         rsp = r.json()
         if 'error' in rsp:
-            pprint(rsp)
+            self.logger.debug(json.dumps(rsp, indent=2))
             return None
         return rsp
 
@@ -49,7 +49,7 @@ class OLS(object):
             id_uri = efo.EFOUtils.get_url_from_ontology_id(obo_id)
         else:
             # should raise an exception!
-            print("No support yet for other ontologies")
+            self.logger.debug("No support yet for other ontologies")
             sys.exit(1)
 
         return self.queryByIRI(id_uri, ontology_name)
@@ -61,7 +61,7 @@ class OLS(object):
         params = dict(q=label, ontology=ontology_name, queryFields="label,synonym", exact='true')
         r = requests.get(url, params=params, timeout=30)
         rsp = r.json()
-        print(r.url)
+        self.logger.debug(r.url)
         # count number of results
         if rsp['response']['numFound'] > 0:
             for doc in rsp['response']['docs']:

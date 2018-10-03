@@ -24,7 +24,7 @@ import pkg_resources as res
 __copyright__ = "Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute"
 __credits__ = ["Gautier Koscielny"]
 __license__ = "Apache 2.0"
-__version__ = "1.0"
+__version__ = "0.4"
 __maintainer__ = "Gautier Koscielny"
 __email__ = "gautier.x.koscielny@gsk.com"
 __status__ = "Production"
@@ -109,6 +109,15 @@ class Config(object):
     EFO_FILES = dict(
         obo = '%s/efo.obo'%EFO_OBO_DIRECTORY,
         obo_full='%s/efo_full.obo' % EFO_OBO_DIRECTORY
+    )
+
+    GO_DIRECTORY = '%s/go'%CACHE_DIRECTORY
+    GO_OBO_DIRECTORY = '%s/obo'%GO_DIRECTORY
+    GO_URIS = [
+        'http://www.geneontology.org/ontology/go.obo',
+    ]
+    GO_FILES = dict(
+        obo = '%s/go.obo'%GO_OBO_DIRECTORY,
     )
 
     MESH_DIRECTORY = '%s/mesh'%CACHE_DIRECTORY

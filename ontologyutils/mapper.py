@@ -30,6 +30,7 @@ class OntologyMapper(object):
         self.ols_mapper = ols.OLS()
         self.zooma_mapper = zooma.Zooma()
         self.oxo_mapper = oxo.OXO()
+        self.logger = logging.getLogger(__name__)
         self.dead_ends = dict()
         self.dead_ends[oxo.SOURCES['efo']] = [oxo.SOURCES['omim'], oxo.SOURCES['orphanet']]
         self.dead_ends[oxo.SOURCES['mondo']] = [oxo.SOURCES['omim'], oxo.SOURCES['orphanet']]
@@ -88,7 +89,7 @@ class OntologyMapper(object):
             # create a list of all the end nodes
             for path in paths:
                 result_paths = ["%s (%s)" % (x, self.oxo_mapper.oxo_labels[x]) for x in path]
-                print(" -> ".join(result_paths))
+                self.logger.debug(" -> ".join(result_paths))
                 '''
                 this part should be improved with a lambda expression but also stop at the stop_dests which is not in the path
                 '''
