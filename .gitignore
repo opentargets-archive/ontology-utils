@@ -51,6 +51,9 @@ coverage.xml
 # Django stuff:
 *.log
 
+# Visual Studio Code stuff
+.vscode/
+
 # Sphinx documentation
 docs/_build/
 

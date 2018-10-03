@@ -2,29 +2,26 @@ from __future__ import print_function
 import sys
 import os
 import pytest
-import ontologyutils as onto
+#import everything to just give a *very* basic tests
+import ontologyutils
+import ontologyutils.efo
+import ontologyutils.hpo
+import ontologyutils.mapper
+import ontologyutils.ols
+import ontologyutils.ou_settings
+import ontologyutils.oxo
+import ontologyutils.rdf_utils
+import ontologyutils.similarity
+import ontologyutils.zooma
+import ontologyutils.hpoUtils
 
-print("Path at terminal when executing this file")
-print(os.getcwd() + "\n")
 
-print("This file path, relative to os.getcwd()")
-print(__file__ + "\n")
+def test_hpo():
+    #load hpo
+    filename = 'tests_resources/hp.obo'
+    hpo = ontologyutils.Ontology.fromOBOFile(filename)
 
-print("This file full path (following symlinks)")
-full_path = os.path.realpath(__file__)
-print(full_path + "\n")
-
-print("This file directory and name")
-path, file = os.path.split(full_path)
-print(path + ' --> ' + file + "\n")
-
-print("This file directory only")
-print(os.path.dirname(full_path))
-
-filename = 'samples/hp.obo'
-hpo = onto.Ontology.fromOBOFile(filename)
-
-def test_hpoterm_exists():
+    #check if term exists as expected
     # "http://purl.obolibrary.org/obo/HP_0001387"
     # comment;synonym;name;hasDbXref;id;is_a;alt_id;def
     assert "name" in list(hpo.terms['HP:0001387']['tags'].keys())
@@ -34,8 +31,8 @@ def test_hpoterm_exists():
     assert not ancestors == None
     assert "HP:0011842" in ancestors
     assert "HP:0000001" in ancestors
-
-def test_hpodbxref_exists():
+    
+    #check cross references
     for xref in ["SNOMEDCT:299032009", 'MeSH:D014552']:
         terms = hpo.getTermsByDbXref(xref)
         assert not terms == None

@@ -8,3 +8,5 @@ rdflib
 pysftp
 configparser
 future
+SPARQLWrapper
+tqdm
