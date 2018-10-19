@@ -5,7 +5,6 @@ import copy
 import re
 import sys
 import os
-import pysftp
 import gzip
 import pickle
 from paramiko import AuthenticationException
