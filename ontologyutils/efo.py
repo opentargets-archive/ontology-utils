@@ -9,11 +9,6 @@ import logging
 from datetime import datetime
 from ontologyutils.ou_settings import Config
 
-__author__ = 'gautierk'
-
-class EFOActions(object):
-    DOWNLOAD='download'
-
 class EFODownloader(object):
 
     def __init__(self):
