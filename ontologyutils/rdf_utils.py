@@ -566,26 +566,26 @@ class OntologyClassReader(object):
         pickle.dump(obj,
                     open(file_path, 'wb'),)
 
-    def load_hpo_classes(self):
+    def load_hpo_classes(self, uri):
         """Loads the HPO graph and extracts the current and obsolete classes.
            Status: production
         """
         logger.debug("load_hpo_classes...")
 
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'hpo'))
+        self.load_ontology_graph(uri)
 
         base_class = 'http://purl.obolibrary.org/obo/HP_0000118'
         self.load_ontology_classes(base_class=base_class)
         self.get_deprecated_classes()
         self.get_top_levels(base_class= base_class)
 
-    def load_mp_classes(self):
+    def load_mp_classes(self, uri):
         """Loads the HPO graph and extracts the current and obsolete classes.
            Status: production
         """
         logger.debug("load_mp_classes...")
 
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
+        self.load_ontology_graph(uri)
         base_class = 'http://purl.obolibrary.org/obo/MP_0000001'
         self.load_ontology_classes(base_class= base_class)
         self.get_deprecated_classes()
@@ -593,7 +593,7 @@ class OntologyClassReader(object):
 
         #self.get_ontology_top_levels(base_class, top_level_map=self.phenotype_top_levels)
 
-    def load_efo_classes(self, lightweight=False, with_uberon=False):
+    def load_efo_classes(self, uri, lightweight=False, uberon_uri=None):
         """Loads the EFO graph and extracts the current and obsolete classes.
            Status: production
         """
@@ -601,12 +601,12 @@ class OntologyClassReader(object):
 
         print("load EFO classes...")
 
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'efo'))
+        self.load_ontology_graph(uri)
 
-        if with_uberon == True:
+        if uberon_uri:
             logger.debug("load Uberon classes...")
             print("load Uberon classes...")
-            self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'uberon'))
+            self.load_ontology_graph(uberon_uri)
 
         print("Done")
         if lightweight == True:
@@ -626,7 +626,7 @@ class OntologyClassReader(object):
         self.get_deprecated_classes()
 
 
-    def get_hpo(self):
+    def get_hpo(self, uri):
         '''
         Load HPO to accept phenotype terms that are not in EFO
         :return:
@@ -635,12 +635,12 @@ class OntologyClassReader(object):
         obj = self._get_from_pickled_file_cache(cache_file)
         if obj is None:
             obj = OntologyClassReader()
-            obj.load_hpo_classes()
+            obj.load_hpo_classes(uri)
             obj.rdf_graph = None
             self._set_in_pickled_file_cache(obj, cache_file)
         return obj
 
-    def get_mp(self):
+    def get_mp(self, uri):
         '''
         Load MP to accept phenotype terms that are not in EFO
         :return:
@@ -650,14 +650,12 @@ class OntologyClassReader(object):
         obj = self._get_from_pickled_file_cache(cache_file)
         if obj is None:
             obj = OntologyClassReader()
-            obj.load_mp_classes()
+            obj.load_mp_classes(uri)
             obj.rdf_graph = None
             self._set_in_pickled_file_cache(obj, cache_file)
         return obj
 
-
-
-    def get_efo(self):
+    def get_efo(self, uri):
         '''
         Load EFO current and obsolete classes to report them to data providers
         :return:
@@ -666,12 +664,12 @@ class OntologyClassReader(object):
         obj = self._get_from_pickled_file_cache(cache_file)
         if obj is None:
             obj = OntologyClassReader()
-            obj.load_efo_classes()
+            obj.load_efo_classes(uri)
             obj.rdf_graph = None
             self._set_in_pickled_file_cache(obj, cache_file)
         return obj
 
-    def load_open_targets_disease_ontology(self):
+    def load_open_targets_disease_ontology(self, efo_uri):
         """Loads the EFO graph and extracts the current and obsolete classes.
            Generates the therapeutic areas
            Creates the other disease class
@@ -679,7 +677,7 @@ class OntologyClassReader(object):
            Status: production
         """
         logger.debug("load_open_targets_disease_ontology...")
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'efo'))
+        self.load_ontology_graph(efo_uri)
         all_ns = [n for n in self.rdf_graph.namespace_manager.namespaces()]
 
         self.get_deprecated_classes(obsoleted_in_version=True)
@@ -740,14 +738,14 @@ class OntologyClassReader(object):
             self.load_ontology_classes(base_class=base_class)
             self.get_classes_paths(root_uri=base_class, level=0)
 
-    def load_human_phenotype_ontology(self):
+    def load_human_phenotype_ontology(self, uri):
         """
             Loads the HPO graph and extracts the current and obsolete classes.
             Status: production
         """
         logger.debug("load_human_phenotype_ontology...")
         #self.load_hpo_classes()
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'hpo'))
+        self.load_ontology_graph(uri)
 
         all_ns = [n for n in self.rdf_graph.namespace_manager.namespaces()]
 
@@ -996,152 +994,3 @@ class DiseaseUtils(object):
         self.update_disease_phenotypes_cache(disease_phenotypes_map)
 
         return disease_phenotypes_map
-
-class PhenotypeSlim(object):
-
-    def __init__(self):
-
-        self.rdf_graph = rdflib.Graph()
-        self.phenotypes = None
-        #self.efo = OntologyClassReader()
-        #self.efo.load_efo_classes()
-
-        self.phenotype_map = dict()
-        self.phenotype_excluded = set()
-
-        self._remote_filenames = dict()
-        self._logger = logging.getLogger(self.__class__.__name__)
-        tqdm_out = TqdmToLogger(self._logger, level=logging.INFO)
-
-
-    def get_ontology_path(self, base_class, term):
-
-        """ if the term is already there or if it is a disease term """
-        if term in self.phenotype_map:
-            return
-
-
-        #if term == 'http://purl.obolibrary.org/obo/HP_0001251':
-        if True:
-
-            for sparql_query in [DIRECT_ANCESTORS, INDIRECT_ANCESTORS]:
-                self.sparql.setQuery(sparql_query%(term, term))
-                self.sparql.setReturnFormat(JSON)
-                results = None
-                n = 0
-                while (n < 2):
-                    try:
-                        results = self.sparql.query().convert()
-                        n = 3
-                    except SPARQLWrapper.SPARQLExceptions.EndPointNotFound as e:
-                        print(e)
-                        self._logger.error(e)
-                        if n > 2:
-                            raise e
-                        else:
-                            n=n+1
-
-                #print len(results)
-                #print json.dumps(results)
-
-                for result in results["results"]["bindings"]:
-                    #print json.dumps(result)
-                    count = int(result['distance']['value'])
-                    parent_label = result['ancestor_label']['value']
-                    ancestor = result['ancestor']['value']
-                    direct_child = result['direct_child']['value']
-                    direct_child_label = result['direct_child_label']['value']
-                    ''' Add the term to the phenotype map '''
-                    if direct_child not in self.phenotype_map:
-                        self.phenotype_map[direct_child] = { 'label': direct_child_label , 'superclasses': [] }
-                    ''' Put all the ancestors to the phenotype map '''
-                    if ancestor not in self.phenotype_map[direct_child]['superclasses']:
-                        self.phenotype_map[direct_child]['superclasses'].append(ancestor)
-                        print("%i %s %s (direct child is %s %s)"%(count, parent_label, ancestor, direct_child_label, direct_child))
-                        print("---------")
-                    #print "%i %s %s (direct child is %s %s)"%(count, parent_label, ancestor, direct_child_label, direct_child)
-
-
-    def load_all_phenotypes(self):
-        '''
-        Load HPO and MP to accept phenotype terms that are not in EFO
-        :return:
-        '''
-        self.phenotypes = OntologyClassReader()
-        self.phenotypes.load_hpo_classes()
-        self.phenotypes.get_classes_paths(root_uri='http://purl.obolibrary.org/obo/HP_0000118')
-        self.phenotypes.load_mp_classes()
-        self.phenotypes.get_classes_paths(root_uri='http://purl.obolibrary.org/obo/MP_0000001')
-
-    def exclude_phenotypes(self, l):
-        '''
-        :param l:
-        :return:
-        '''
-        for p in l:
-            if p not in self.phenotype_excluded:
-                self.phenotype_excluded.add(p)
-                print("Excluding %s"%p)
-                # get parents
-                sparql_query = DIRECT_ANCESTORS
-                self.sparql.setQuery(sparql_query%(p, p))
-                self.sparql.setReturnFormat(JSON)
-                results = self.sparql.query().convert()
-                al = []
-                for result in results["results"]["bindings"]:
-                    count = int(result['distance']['value'])
-                    parent_label = result['ancestor_label']['value']
-                    ancestor = result['ancestor']['value']
-                    al.append(ancestor)
-                    self.exclude_phenotypes(al)
-
-    def _store_remote_filename(self, filename):
-        # print "%s" % filename
-        self._logger.debug("%s" % filename)
-        if filename.startswith('/upload/submissions/') and \
-            filename.endswith('.json.gz'):
-            self._logger.debug("%s" % filename)
-            if True:
-                version_name = filename.split('/')[3].split('.')[0]
-                # print "%s" % filename
-                if '-' in version_name:
-                    user, day, month, year = version_name.split('-')
-                    if '_' in user:
-                        datasource = ''.join(user.split('_')[1:])
-                        user = user.split('_')[0]
-                    else:
-                        datasource = Config.DATASOURCE_INTERNAL_NAME_TRANSLATION_REVERSED[user]
-                    release_date = date(int(year), int(month), int(day))
-
-                    if user not in self._remote_filenames:
-                        self._remote_filenames[user]={datasource : dict(date = release_date,
-                                                                          file_path = filename,
-                                                                          file_version = version_name)
-                                                      }
-                    elif datasource not in self._remote_filenames[user]:
-                        self._remote_filenames[user][datasource] = dict(date=release_date,
-                                                                        file_path=filename,
-                                                                        file_version=version_name)
-                    else:
-                        if release_date > self._remote_filenames[user][datasource]['date']:
-                            self._remote_filenames[user][datasource] = dict(date=release_date,
-                                                                file_path=filename,
-                                                                file_version=version_name)
-            #except e:
-            #    self.logger.error("%s Error checking file %s: %s" % (self.__class__.__name__, filename, e))
-            #    print 'error getting remote file%s'%filename
-            #    self.logger.debug('error getting remote file%s'%filename)
-
-    def _callback_not_used(self, path):
-        self._logger.debug("skipped " + path)
-
-    def create_phenotype_slim_from_selection(self):
-
-        for url in Config.PHENOTYPE_SLIM_INPUT_URLS:
-            response = requests.get(url)
-            self._logger.info("Read url %s - response code %s" % (url, response.code))
-            lines = response.readlines()
-
-            for line in lines:
-                self._logger.info(line.rstrip())
-
