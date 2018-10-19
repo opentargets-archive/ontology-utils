@@ -4,8 +4,7 @@ jobs:
     docker: 
     # the primary container, where your job's commands are run
     # uses python 3.6.6 but then tox will also use its own version specifications inside virtualenv
-    # circle ci only has browsers images for python - bigger, but circle ci will cache them 
-      - image: circleci/python:3.6.6-stretch-browsers 
+      - image: circleci/python:3.6.6
 
     steps:
       - checkout # check out the code in the project directory
