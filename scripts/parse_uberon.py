@@ -10,7 +10,7 @@ import sys
 def main():
 
     parser = optparse.OptionParser()
-    parser.add_option('-i', '--input', type='string', default=Config.GO_FILES['obo'], dest='ontoFilename')
+    parser.add_option('-i', '--input', type='string', default=Config.UBERON_FILES['obo'], dest='ontoFilename')
 
     options, args = parser.parse_args()
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)

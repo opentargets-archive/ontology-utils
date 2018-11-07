@@ -120,6 +120,15 @@ class Config(object):
         obo = '%s/go.obo'%GO_OBO_DIRECTORY,
     )
 
+    UBERON_DIRECTORY = '%s/uberon' % CACHE_DIRECTORY
+    UBERON_OBO_DIRECTORY = '%s/obo' % UBERON_DIRECTORY
+    UBERON_URIS = [
+        'http://www.geneontology.org/ontology/go.obo',
+    ]
+    UBERON_FILES = dict(
+        obo='%s/uberon.obo' % UBERON_OBO_DIRECTORY,
+    )
+
     MESH_DIRECTORY = '%s/mesh'%CACHE_DIRECTORY
     MESH_CSV_DIRECTORY = '%s/csv'%MESH_DIRECTORY
     MESH_URIS = [
