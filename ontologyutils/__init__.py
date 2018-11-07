@@ -110,20 +110,25 @@ class Ontology(object):
                                 if re.match("part_of|regulates|negatively_regulates|positively_regulates|happens_during|starts_during|occurs_in", p):
                                 #if any(map(lambda x: p.startswith(x), ['part_of', 'regulates', 'negatively_regulates', 'positively_regulates', 'happens_during', 'starts_during', 'occurs_in'])):
                                     #print('=========='.join(p.split()))
-                                    (property_key, object_id) = p.split()
-                                    reverse_key = 'r_' + property_key
-                                    if 'dag' not in self.terms[termID]:
-                                        self.terms[termID]['dag'] = dict()
-                                    if property_key not in self.terms[termID]['dag'].keys():
-                                        self.terms[termID]['dag'][property_key] = []
-                                        self.terms[termID]['dag'][property_key].append(object_id)
-                                    if object_id not in list(self.terms.keys()):
-                                        self.terms[object_id] = dict()
-                                        self.terms[object_id]['dag'] = dict()
-                                        self.terms[object_id]['dag'][reverse_key] = []
-                                    elif reverse_key not in self.terms[object_id]['dag'].keys():
-                                        self.terms[object_id]['dag'][reverse_key] = []
-                                    self.terms[object_id]['dag'][reverse_key].append(termID)
+                                    #print(p)
+                                    split_array = p.split()
+                                    if len(split_array) == 2:
+                                        (property_key, object_id) = split_array
+                                        reverse_key = 'r_' + property_key
+                                        if 'dag' not in self.terms[termID]:
+                                            self.terms[termID]['dag'] = dict()
+                                        if property_key not in self.terms[termID]['dag'].keys():
+                                            self.terms[termID]['dag'][property_key] = []
+                                            self.terms[termID]['dag'][property_key].append(object_id)
+                                        if object_id not in list(self.terms.keys()):
+                                            self.terms[object_id] = dict()
+                                            self.terms[object_id]['dag'] = dict()
+                                            self.terms[object_id]['dag'][reverse_key] = []
+                                        elif reverse_key not in self.terms[object_id]['dag'].keys():
+                                            self.terms[object_id]['dag'][reverse_key] = []
+                                        self.terms[object_id]['dag'][reverse_key].append(termID)
+                                    else:
+                                        print("split function not supported for axiom: ", p)
                 else:
                     break
 
