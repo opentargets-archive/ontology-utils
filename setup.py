@@ -33,8 +33,9 @@ setup(
     author_email="gautier.x.koscielny@gsk.com",
     url="https://github.com/opentargets",
     packages=["ontologyutils"],
+    #make sure this matches requirements.txt
     install_requires=[
-        'requests'
+        'requests','numpy','rdflib','configparser','future','tqdm'
       ],
     license="Apache2",
     classifiers=[
@@ -42,5 +43,7 @@ setup(
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
     ],
+    #make sure this matches requirements.txt
+    extras_require={'dev': ['pytest-cov','codecov','tox']}
 )
 

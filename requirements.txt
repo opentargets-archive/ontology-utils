@@ -1,11 +1,12 @@
-pytest
+#make sure this matches setup.py install_requires
+
 pytest-cov
 tox
+codecov
+
 numpy
-scipy
 requests
 rdflib
 configparser
 future
-SPARQLWrapper
 tqdm
