@@ -8,13 +8,11 @@ import os
 import gzip
 import pickle
 import logging
-import json
 import rdflib
 import requests
 from rdflib import URIRef
 from rdflib.namespace import Namespace
 from rdflib.namespace import RDF, RDFS
-from SPARQLWrapper import SPARQLWrapper, JSON
 from tqdm import tqdm
 from datetime import date
 from ontologyutils.ou_settings import Config
@@ -516,9 +514,6 @@ class OntologyClassReader(object):
             self.classes_paths[node_uri]['all'].append(all_struct)
             self.classes_paths[node_uri]['labels'].append(labels_struct)
             self.classes_paths[node_uri]['ids'].append(ids_struct)
-
-            #logger.debug("** %s **"%node_uri)
-            #logger.debug( json.dumps(self.classes_paths[node_uri], indent=2) )
 
         return
 
