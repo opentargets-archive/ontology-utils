@@ -64,10 +64,10 @@ class OXO(object):
         r = requests.get(url, timeout=30)
         self.logger.debug(r.url)
         if r.status_code == 404:
-            return None
+            return []
         rsp = r.json()
         if 'error' in rsp:
-            return None
+            return []
         return rsp
 
     def query_by_obo_id(self, obo_id, stop_dests=[SOURCES['efo']]):
@@ -80,10 +80,10 @@ class OXO(object):
         r = requests.get(url, params=params, timeout=30)
         self.logger.debug(r.url)
         if r.status_code == 404:
-            return None
+            return results
         rsp = r.json()
         if 'error' in rsp:
-            return None
+            return results
 
         # totalElements will give the number of elements per page
         if rsp['page']['totalElements'] == 0:
