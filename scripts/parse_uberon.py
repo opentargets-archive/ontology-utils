@@ -22,6 +22,8 @@ def main():
     for id in ontology.terms:
 
         paths = ontology.get_all_paths(id)
+        # check synonyms
+        
 
         # only look at specific ancestors
         '''

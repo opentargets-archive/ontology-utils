@@ -46,6 +46,12 @@ class Ontology(object):
 
             data[tag].append(value)
 
+            #if 'id' in data and data['id'][0] == 'UBERON:0002084':
+            #    print(line)
+            #    print(tag, value)
+
+        if 'id' in data and data['id'][0] == 'UBERON:0002084':
+            print("; ".join(data['name']))
         return data
 
     def loadOBOOntology(self, filename, all_relationships=False):
@@ -59,8 +65,12 @@ class Ontology(object):
             while 1:
                 #get the term using the two parsing functions
                 term = self.parseTagValue(self.getTerm(oboFile))
-                if len(term) != 0:
+                if term is not None:
                     termID = term['id'][0];
+                    if termID == 'UBERON:0012249':
+                        print('FOUND ectocervix')
+                        print("; ".join(term['name']))
+                        break
 
                     if termID not in list(self.terms.keys()):
 
