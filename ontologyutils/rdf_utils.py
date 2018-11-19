@@ -878,7 +878,7 @@ class DiseaseUtils(object):
     def __init__(self):
         pass
 
-    def get_disease_phenotypes(self, ontologyclassreader=None, uri_hpo, uri_mp, uri_disease_phenotypes):
+    def get_disease_phenotypes(self, ontologyclassreader, uri_hpo, uri_mp, uri_disease_phenotypes):
 
         disease_phenotypes_map = dict()
 
