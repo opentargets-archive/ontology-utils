@@ -549,18 +549,6 @@ class OntologyClassReader(object):
         '''
         return rdf_properties
 
-    def _get_from_pickled_file_cache(self, file_id):
-        file_path = os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), file_id+'.pck')
-        if os.path.isfile(file_path):
-            return pickle.load(open(file_path, 'rb'))
-
-    def _set_in_pickled_file_cache(self, obj, file_id):
-        if not os.path.isdir(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'))):
-            os.makedirs(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir')))
-        file_path = os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), file_id+'.pck')
-        pickle.dump(obj,
-                    open(file_path, 'wb'),)
-
     def load_hpo_classes(self, uri):
         """Loads the HPO graph and extracts the current and obsolete classes.
            Status: production
@@ -627,12 +615,9 @@ class OntologyClassReader(object):
         :return:
         '''
         cache_file = 'rdfutils_hpo_lookup'
-        obj = self._get_from_pickled_file_cache(cache_file)
-        if obj is None:
-            obj = OntologyClassReader()
-            obj.load_hpo_classes(uri)
-            obj.rdf_graph = None
-            self._set_in_pickled_file_cache(obj, cache_file)
+        obj = OntologyClassReader()
+        obj.load_hpo_classes(uri)
+        obj.rdf_graph = None
         return obj
 
     def get_mp(self, uri):
@@ -642,12 +627,9 @@ class OntologyClassReader(object):
         '''
         cache_file = 'rdfutils_mp_lookup'
         obj = None
-        obj = self._get_from_pickled_file_cache(cache_file)
-        if obj is None:
-            obj = OntologyClassReader()
-            obj.load_mp_classes(uri)
-            obj.rdf_graph = None
-            self._set_in_pickled_file_cache(obj, cache_file)
+        obj = OntologyClassReader()
+        obj.load_mp_classes(uri)
+        obj.rdf_graph = None
         return obj
 
     def get_efo(self, uri):
@@ -656,12 +638,9 @@ class OntologyClassReader(object):
         :return:
         '''
         cache_file = 'rdfutils_efo_lookup'
-        obj = self._get_from_pickled_file_cache(cache_file)
-        if obj is None:
-            obj = OntologyClassReader()
-            obj.load_efo_classes(uri)
-            obj.rdf_graph = None
-            self._set_in_pickled_file_cache(obj, cache_file)
+        obj = OntologyClassReader()
+        obj.load_efo_classes(uri)
+        obj.rdf_graph = None
         return obj
 
     def load_open_targets_disease_ontology(self, efo_uri):
@@ -763,13 +742,13 @@ class OntologyClassReader(object):
             self.get_deprecated_classes()
             print(len(self.current_classes))
 
-    def load_mammalian_phenotype_ontology(self):
+    def load_mammalian_phenotype_ontology(self, uri):
         """
             Loads the MP graph and extracts the current and obsolete classes.
             Status: production
         """
         logger.debug("load_mammalian_phenotype_ontology...")
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
+        self.load_ontology_graph(uri)
 
         all_ns = [n for n in self.rdf_graph.namespace_manager.namespaces()]
 
@@ -821,13 +800,13 @@ class OntologyClassReader(object):
                 OMIMmap[omimID] = [ uri ]
         return OMIMmap
 
-    def load_evidence_classes(self):
+    def load_evidence_classes(self, uri_so, uri_eco):
         '''
         Loads evidence from ECO, SO and the Open Targets evidence classes
         :return:
         '''
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'so'))
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'eco'))
+        self.load_ontology_graph(uri_so)
+        self.load_ontology_graph(uri_eco)
 
         evidence_uri = URIRef('http://purl.obolibrary.org/obo/ECO_0000000')
 
@@ -899,65 +878,18 @@ class DiseaseUtils(object):
     def __init__(self):
         pass
 
-    def get_disease_tas(self, ontologyreader=None, filename=None):
-
-        # get all tas per
-        fh = open(filename, 'w')
-        for uri, label in list(ontologyreader.current_classes.items()):
-            if uri in ontologyreader.classes_paths and uri != "http://www.ebi.ac.uk/efo/EFO_0000408":
-                tas = [x[1]['label'] for x in ontologyreader.classes_paths[uri]['all']]
-                fh.write("%s\t%s\t%s\n"%(uri, label, ",".join(set(tas))))
-        fh.close()
-
-    def check_disease_phenotypes_cache(self):
-        return os.path.isfile(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), "disease_phenotypes.pck"))
-
-    def read_disease_phenotypes_cache(self):
-        return pickle.load( open( os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'),"disease_phenotypes.pck"), 'rb'))
-
-    def update_disease_phenotypes_cache(self, disease_phenotypes):
-        if not os.path.isdir(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'))):
-            os.makedirs(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir')))
-        pickle.dump(disease_phenotypes,
-            open(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), "disease_phenotypes.pck"), 'wb'),
-                    protocol=pickle.HIGHEST_PROTOCOL)
-
-    def write_disease_phenotypes(self, ontologyreader=None, filename=None):
-
-        pmap = self.get_disease_phenotypes(ontologyreader)
-
-        fh = open(filename, 'w')
-        for uri, ds in list(pmap.items()):
-            label = ds['label']
-            phenotypes = [x['label'] for x in ds['phenotypes']]
-            fh.write("%s\t%s\t%s\n" % (uri, label, ",".join(set(phenotypes))))
-        fh.close()
-        '''
-        for uri, label in self.diseases.current_classes.items():
-            logger.debug("%s %s"%(uri, label))
-            if uri in pmap:
-                logger.debug("=> OK")
-                tas = []
-                phenotypes = map(lambda x: x['label'], map[uri])
-                if uri in self.diseases.classes_paths and uri != "http://www.ebi.ac.uk/efo/EFO_0000408":
-                    tas = map(lambda x: x[1]['label'], self.diseases.classes_paths[uri]['all'])
-                fh.write("%s\t%s\t%s\t%s\n" % (uri, label, ",".join(set(phenotypes)), ",".join(set(tas))))
-        '''
-
-    def get_disease_phenotypes(self, ontologyclassreader=None):
+    def get_disease_phenotypes(self, ontologyclassreader=None, uri_hpo, uri_mp, uri_disease_phenotypes):
 
         disease_phenotypes_map = dict()
 
-        if self.check_disease_phenotypes_cache():
-            return self.read_disease_phenotypes_cache()
 
         # load HPO:
         logger.debug("Merge HPO graph")
-        ontologyclassreader.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'hpo'))
+        ontologyclassreader.load_ontology_graph(uri_hpo)
         logger.debug("Merge MP graph")
-        ontologyclassreader.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
+        ontologyclassreader.load_ontology_graph(uri_mp)
 
-        for key, uri in Config.ONTOLOGY_CONFIG.items('disease_phenotypes_uris'):
+        for key, uri in uri_disease_phenotypes:
             logger.debug("merge phenotypes from %s" % uri)
             ontologyclassreader.rdf_graph.parse(uri, format='xml')
 
@@ -985,7 +917,5 @@ class DiseaseUtils(object):
                 disease_phenotypes_map[disease_uri] = { 'label': disease_label, 'phenotypes': [] }
             if phenotype_uri not in [x['uri'] for x in disease_phenotypes_map[disease_uri]['phenotypes']]:
                 disease_phenotypes_map[disease_uri]['phenotypes'].append({'label': phenotype_label, 'uri': phenotype_uri})
-
-        self.update_disease_phenotypes_cache(disease_phenotypes_map)
 
         return disease_phenotypes_map
