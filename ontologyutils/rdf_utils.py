@@ -13,7 +13,6 @@ import requests
 from rdflib import URIRef
 from rdflib.namespace import Namespace
 from rdflib.namespace import RDF, RDFS
-from tqdm import tqdm
 from datetime import date
 from ontologyutils.ou_settings import Config
 
