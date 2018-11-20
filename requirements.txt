@@ -9,4 +9,3 @@ requests
 rdflib
 configparser
 future
-tqdm

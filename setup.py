@@ -35,7 +35,7 @@ setup(
     packages=["ontologyutils"],
     #make sure this matches requirements.txt
     install_requires=[
-        'requests','numpy','rdflib','configparser','future','tqdm'
+        'requests','numpy','rdflib','configparser','future'
       ],
     license="Apache2",
     classifiers=[
