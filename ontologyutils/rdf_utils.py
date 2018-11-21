@@ -172,17 +172,23 @@ order by ?count
 subclass generators: yield a series of values
 '''
 def _get_subclass_of(arg, graph):
-    #logger.debug("[_get_subclass_of] %i"%len(arg))
+    
     node = arg[0]
     depth = arg[1]
     path = arg[2]
     level = arg[3]
-    #logger.debug("Superclass: %s; label: %s; depth: %i"%(str(node.identifier), node.value(RDFS.label), depth))
+    logger.debug("Superclass: %s; label: %s; depth: %i"%(str(node.identifier), node.value(RDFS.label), depth))
 
     if level > 0 and depth == level:
         return
     for c in graph.subjects(predicate=RDFS.subClassOf, object=node.identifier):
+
         cr = rdflib.resource.Resource(graph, c)
+        if cr.identifier == node.identifier:
+            logger.warning("self reference on {} skipping".format(node.identifier))
+            continue
+
+
         label = cr.value(RDFS.label)
         #logger.debug("\tSubClass: %s; label: %s"%(str(cr.identifier), label))
 
