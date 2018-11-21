@@ -6,14 +6,14 @@ import pytest
 import ontologyutils
 import ontologyutils.efo
 import ontologyutils.hpo
-import ontologyutils.mapper
-import ontologyutils.ols
-import ontologyutils.ou_settings
-import ontologyutils.oxo
-import ontologyutils.rdf_utils
-import ontologyutils.similarity
-import ontologyutils.zooma
-import ontologyutils.hpoUtils
+import opentargets_ontologyutils.mapper
+import opentargets_ontologyutils.ols
+import opentargets_ontologyutils.ou_settings
+import opentargets_ontologyutils.oxo
+import opentargets_ontologyutils.rdf_utils
+import opentargets_ontologyutils.similarity
+import opentargets_ontologyutils.zooma
+import opentargets_ontologyutils.hpoUtils
 
 
 def test_hpo():
