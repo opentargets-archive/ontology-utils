@@ -5,7 +5,7 @@ import json
 import logging
 import ontologyutils as onto
 import ontologyutils.efo as efo
-from ontologyutils.ou_settings import Config
+from opentargets_ontologyutils.ou_settings import Config
 
 
 def main():

@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 from datetime import datetime
-from ontologyutils.ou_settings import Config
+from opentargets_ontologyutils.ou_settings import Config
 
 class EFODownloader(object):
 

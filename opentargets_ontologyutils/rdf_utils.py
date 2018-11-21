@@ -14,7 +14,7 @@ from rdflib import URIRef
 from rdflib.namespace import Namespace
 from rdflib.namespace import RDF, RDFS
 from datetime import date
-from ontologyutils.ou_settings import Config
+from opentargets_ontologyutils.ou_settings import Config
 
 
 __copyright__ = "Copyright 2014-2018, Open Targets"
