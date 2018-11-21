@@ -3,9 +3,9 @@ import sys
 import os
 import pytest
 #import everything to just give a *very* basic tests
-import ontologyutils
-import ontologyutils.efo
-import ontologyutils.hpo
+import opentargets_ontologyutils
+import opentargets_ontologyutils.efo
+import opentargets_ontologyutils.hpo
 import opentargets_ontologyutils.mapper
 import opentargets_ontologyutils.ols
 import opentargets_ontologyutils.ou_settings
