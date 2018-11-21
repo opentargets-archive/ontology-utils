@@ -9,7 +9,7 @@ except ImportError:
 
 # importing __<vars>__ into the namespace
 #https://packaging.python.org/guides/single-sourcing-package-version/#single-sourcing-the-version
-with open('opentargets_validator/version.py') as fv:
+with open('ontologyutils/version.py') as fv:
     exec(fv.read())
 
 long_description = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
