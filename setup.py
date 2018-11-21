@@ -1,20 +1,4 @@
-'''
-Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
-
-This software was developed as part of the Open Targets project. For more information please see: http://www.opentargets.org
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-'''
+#!/usr/bin/env python
 import os
 
 try:
@@ -22,22 +6,35 @@ try:
 except ImportError:
     from distutils import setup
 
+
+# importing __<vars>__ into the namespace
+#https://packaging.python.org/guides/single-sourcing-package-version/#single-sourcing-the-version
+with open('opentargets_validator/version.py') as fv:
+    exec(fv.read())
+
 long_description = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
 
 setup(
-    name="ontologyutils",
-    version="0.4",
-    description=long_description.split("\n")[0],
+    name=__pkgname__,
+    version=__version__,
+    description=__description__,
     long_description=long_description,
-    author="Gautier Koscielny",
-    author_email="gautier.x.koscielny@gsk.com",
-    url="https://github.com/opentargets",
-    packages=["ontologyutils"],
+    author=__author__,
+    author_email=__author_email__,
+    url=__homepage__,
+    packages=["opentargets_ontologyutils"],
+    license=__license__,
+    download_url=__homepage__ + '/archive/' + __version__ + '.tar.gz',
+    keywords=['opentargets', 'bioinformatics', 'ontology'],
+    platforms=['any'],
     #make sure this matches requirements.txt
     install_requires=[
         'requests','numpy','rdflib','configparser','future'
       ],
-    license="Apache2",
+    include_package_data=True,
+    entry_points={},
+    data_files=[],
+    scripts=[],
     classifiers=[
         "License :: Apache 2",
         "Programming Language :: Python :: 2",

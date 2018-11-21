@@ -1,0 +1,5 @@
+#make sure this matches setup.py extras_require
+
+pytest-cov
+tox
+codecov
