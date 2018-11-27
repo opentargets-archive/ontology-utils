@@ -1,0 +1,25 @@
+language: python
+python:
+  - '2.7'
+  - '3.6'
+sudo: required
+install:
+  - pip install -e .[dev]
+script: 
+  - pytest --cov=opentargets_ontologyutils --cov-report term tests/ --fulltrace
+deploy:
+  provider: pypi
+  user: "${PYPI_USERNAME}"
+  password: "${PYPI_PASSWORD}"
+  on:
+    tags: true
+  distributions: "sdist bdist_wheel"
+
+notifications:
+  email:
+    recipients:
+    - ops@opentargets.org
+    on_success: never
+    on_failure: always
+after_success:
+  - codecov

@@ -7,12 +7,8 @@ import os
 import urllib.request, urllib.error, urllib.parse
 import logging
 from datetime import datetime
-from ontologyutils.ou_settings import Config
+from opentargets_ontologyutils.ou_settings import Config
 
-__author__ = 'gautierk'
-
-class HPOActions(object):
-    DOWNLOAD='download'
 
 class HPODownloader(object):
 

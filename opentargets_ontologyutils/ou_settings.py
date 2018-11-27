@@ -73,8 +73,6 @@ class Config(object):
         CACHE_DIRECTORY = os.environ['ONTOLOGYUTILS_CACHE']
 
 
-    ONTOLOGY_CONFIG = configparser.ConfigParser()
-    ONTOLOGY_CONFIG.read(file_or_resource(u'ontology_config.ini'))
     HPO_DIRECTORY = '%s/hpo'%CACHE_DIRECTORY
     HPO_OBO_DIRECTORY = '%s/obo'%HPO_DIRECTORY
     HPO_ANNOTATIONS_DIRECTORY = '%s/annotations'%HPO_DIRECTORY

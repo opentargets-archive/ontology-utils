@@ -1,8 +1,0 @@
-actionid=tox
-msg=packaging
-cmdargs=['/usr/bin/python2.7', local('/cygdrive/c/Users/gk680303/gitlab/ontology-utils/src/python/ontologyutils/setup.py'), 'sdist', '--formats=zip', '--dist-dir', local('/cygdrive/c/Users/gk680303/gitlab/ontology-utils/src/python/ontologyutils/.tox/dist')]
-env=None
-Traceback (most recent call last):
-  File "setup.py", line 9, in <module>
-    long_description = open(os.path.join(os.path.dirname(__file__), "README.rst")).read()
-IOError: [Errno 2] No such file or directory: 'README.rst'

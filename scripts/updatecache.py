@@ -1,4 +1,4 @@
-from ontologyutils.efo import EFODownloader
+from opentargets_ontologyutils.efo import EFODownloader
 
 __copyright__ = "Copyright 2014-2018, Open Targets"
 __credits__ = ["Gautier Koscielny"]

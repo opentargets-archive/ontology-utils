@@ -3,23 +3,23 @@ import sys
 import os
 import pytest
 #import everything to just give a *very* basic tests
-import ontologyutils
-import ontologyutils.efo
-import ontologyutils.hpo
-import ontologyutils.mapper
-import ontologyutils.ols
-import ontologyutils.ou_settings
-import ontologyutils.oxo
-import ontologyutils.rdf_utils
-import ontologyutils.similarity
-import ontologyutils.zooma
-import ontologyutils.hpoUtils
+import opentargets_ontologyutils
+import opentargets_ontologyutils.efo
+import opentargets_ontologyutils.hpo
+import opentargets_ontologyutils.mapper
+import opentargets_ontologyutils.ols
+import opentargets_ontologyutils.ou_settings
+import opentargets_ontologyutils.oxo
+import opentargets_ontologyutils.rdf_utils
+import opentargets_ontologyutils.similarity
+import opentargets_ontologyutils.zooma
+import opentargets_ontologyutils.hpoUtils
 
 
 def test_hpo():
     #load hpo
     filename = 'tests_resources/hp.obo'
-    hpo = ontologyutils.Ontology.fromOBOFile(filename)
+    hpo = opentargets_ontologyutils.Ontology.fromOBOFile(filename)
 
     #check if term exists as expected
     # "http://purl.obolibrary.org/obo/HP_0001387"

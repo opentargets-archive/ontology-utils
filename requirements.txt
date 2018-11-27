@@ -1,12 +1,7 @@
-pytest
-pytest-cov
-tox
+#make sure this matches setup.py install_requires
+
 numpy
-scipy
 requests
 rdflib
-pysftp
 configparser
 future
-SPARQLWrapper
-tqdm

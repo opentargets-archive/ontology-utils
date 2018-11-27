@@ -3,8 +3,8 @@ import json
 import sys
 import optparse
 import logging
-from ontologyutils.similarity import PhenotypeLookup, Diseases
-from ontologyutils.ou_settings import Config
+from opentargets_ontologyutils.similarity import PhenotypeLookup, Diseases
+from opentargets_ontologyutils.ou_settings import Config
 
 hpo = None
 ICs = dict()
