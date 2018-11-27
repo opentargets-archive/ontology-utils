@@ -1,5 +1,5 @@
 import re
-import ontologyutils as onto
+import opentargets_ontologyutils as onto
 import optparse
 import logging
 from opentargets_ontologyutils.ou_settings import Config

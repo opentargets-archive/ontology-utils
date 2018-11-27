@@ -5,7 +5,7 @@ from builtins import object
 import sys
 import requests
 import urllib.request, urllib.parse, urllib.error
-import ontologyutils.efo as efo
+import opentargets_ontologyutils.efo as efo
 import logging
 import json
 from pprint import pprint

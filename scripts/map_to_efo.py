@@ -2,9 +2,9 @@ from __future__ import print_function
 import csv
 import optparse
 import logging
-import ontologyutils.mapper as mapper
-import ontologyutils.ols as ols
-import ontologyutils.oxo as oxo
+import opentargets_ontologyutils.mapper as mapper
+import opentargets_ontologyutils.ols as ols
+import opentargets_ontologyutils.oxo as oxo
 from pprint import pprint
 
 def main():

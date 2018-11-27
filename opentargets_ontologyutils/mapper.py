@@ -17,9 +17,9 @@ limitations under the License.
 '''
 from __future__ import print_function
 from builtins import object
-import ontologyutils.ols as ols
-import ontologyutils.zooma as zooma
-import ontologyutils.oxo as oxo
+import opentargets_ontologyutils.ols as ols
+import opentargets_ontologyutils.zooma as zooma
+import opentargets_ontologyutils.oxo as oxo
 import logging
 
 __author__ = 'gautierk'

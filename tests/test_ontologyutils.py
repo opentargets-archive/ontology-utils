@@ -19,7 +19,7 @@ import opentargets_ontologyutils.hpoUtils
 def test_hpo():
     #load hpo
     filename = 'tests_resources/hp.obo'
-    hpo = ontologyutils.Ontology.fromOBOFile(filename)
+    hpo = opentargets_ontologyutils.Ontology.fromOBOFile(filename)
 
     #check if term exists as expected
     # "http://purl.obolibrary.org/obo/HP_0001387"

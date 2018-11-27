@@ -3,7 +3,7 @@ from __future__ import print_function
 from builtins import filter
 from past.utils import old_div
 from builtins import object
-import ontologyutils as onto
+import opentargets_ontologyutils as onto
 import numpy
 import math
 import operator

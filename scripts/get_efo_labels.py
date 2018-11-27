@@ -3,8 +3,8 @@ import csv
 import optparse
 import json
 import logging
-import ontologyutils as onto
-import ontologyutils.efo as efo
+import opentargets_ontologyutils as onto
+import opentargets_ontologyutils.efo as efo
 from opentargets_ontologyutils.ou_settings import Config
 
 
