@@ -2,19 +2,11 @@ from __future__ import print_function
 import sys
 import os
 import pytest
+
 #import everything to just give a *very* basic tests
 import opentargets_ontologyutils
-import opentargets_ontologyutils.efo
-import opentargets_ontologyutils.hpo
-import opentargets_ontologyutils.mapper
-import opentargets_ontologyutils.ols
 import opentargets_ontologyutils.ou_settings
-import opentargets_ontologyutils.oxo
 import opentargets_ontologyutils.rdf_utils
-import opentargets_ontologyutils.similarity
-import opentargets_ontologyutils.zooma
-import opentargets_ontologyutils.hpoUtils
-
 
 def test_hpo():
     #load hpo
