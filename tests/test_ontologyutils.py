@@ -5,7 +5,6 @@ import pytest
 
 #import everything to just give a *very* basic tests
 import opentargets_ontologyutils
-import opentargets_ontologyutils.ou_settings
 import opentargets_ontologyutils.rdf_utils
 
 def test_hpo():

@@ -14,7 +14,6 @@ from rdflib import URIRef
 from rdflib.namespace import Namespace
 from rdflib.namespace import RDF, RDFS
 from datetime import date
-from opentargets_ontologyutils.ou_settings import Config
 
 logger = logging.getLogger(__name__)
 

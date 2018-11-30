@@ -29,7 +29,7 @@ setup(
     platforms=['any'],
     #make sure this matches requirements.txt
     install_requires=[
-        'requests','numpy','rdflib','configparser','future'
+        'requests','rdflib','future'
       ],
     include_package_data=True,
     entry_points={},
