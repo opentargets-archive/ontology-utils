@@ -83,27 +83,26 @@ class OntologyClassReader(object):
         if len(self.obsoletes) == 0:
 
             sparql_query = '''
-            SELECT DISTINCT ?ont_node ?label ?label ?ont_new
-             {
-                ?ont_node owl:deprecated true .
-                ?ont_node obo:IAO_0100001 ?ont_new_id .
-                ?ont_new oboInOwl:id ?ont_new_id .
-                ?ont_node rdfs:label ?label
-             }
-            '''
+                SELECT DISTINCT ?ont_node ?label ?label ?ont_new
+                {
+                    ?ont_node owl:deprecated true .
+                    ?ont_node obo:IAO_0100001 ?ont_new_id .
+                    ?ont_new oboInOwl:id ?ont_new_id .
+                    ?ont_node rdfs:label ?label
+                }
+                '''
 
             if obsoleted_in_version:
 
                 sparql_query = '''
-                                SELECT DISTINCT ?ont_node ?label ?reason ?ont_new_id
-                                 {
-                                    ?ont_node rdfs:subClassOf oboInOwl:ObsoleteClass . 
-                                    ?ont_node obo:IAO_0100001 ?ont_new_id .
-                                    ?ont_node rdfs:label ?label . 
-                                    ?ont_node efo:reason_for_obsolescence ?reason
-                                 }
-                                '''
-
+                    SELECT DISTINCT ?ont_node ?label ?reason ?ont_new_id
+                    {
+                    ?ont_node rdfs:subClassOf oboInOwl:ObsoleteClass . 
+                    ?ont_node obo:IAO_0100001 ?ont_new_id .
+                    ?ont_node rdfs:label ?label . 
+                    ?ont_node efo:reason_for_obsolescence ?reason
+                    }
+                    '''
 
                 '''
                 <rdfs:subClassOf rdf:resource="http://www.geneontology.org/formats/oboInOwl#ObsoleteClass"/>
