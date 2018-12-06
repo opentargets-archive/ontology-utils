@@ -37,9 +37,6 @@ def get_efo(uri):
     :return:
     '''
     obj = OntologyClassReader()
-    obj.load_efo_classes(uri)
-
-    logger.debug("load_efo_classes...")
 
     obj.load_ontology_graph(uri)
 
