@@ -1,5 +1,5 @@
 #make sure this matches setup.py install_requires
 
-requests
+requests-file
 rdflib
 future
