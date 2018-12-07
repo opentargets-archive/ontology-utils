@@ -94,7 +94,6 @@ class URLZSource(object):
                 with tempfile.NamedTemporaryFile(mode='wb', suffix=local_filename, delete=False) as fd:
                     file_to_open = fd.name
 
-                    print("downloading %s to %s", self.filename, file_to_open)
                     self.logger.debug("downloading %s to %s", self.filename, file_to_open)
 
                     # write data into file in streaming fashion
