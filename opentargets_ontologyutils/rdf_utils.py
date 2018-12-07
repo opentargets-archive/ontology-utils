@@ -14,6 +14,7 @@ from rdflib import URIRef
 from rdflib.namespace import Namespace
 from rdflib.namespace import RDF, RDFS
 from datetime import date
+from opentargets_ontologyutils import URLZSource
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ def _get_subclass_of(arg, graph):
     depth = arg[1]
     path = arg[2]
     level = arg[3]
-    logger.debug("Superclass: %s; label: %s; depth: %i"%(str(node.identifier), node.value(RDFS.label), depth))
+    #logger.debug("Superclass: %s; label: %s; depth: %i"%(str(node.identifier), node.value(RDFS.label), depth))
 
     if level > 0 and depth == level:
         return
@@ -73,7 +74,8 @@ class OntologyClassReader(object):
             None
 
         """
-        self.rdf_graph.parse(uri, format='xml')
+        with URLZSource(uri).open() as source:
+            self.rdf_graph.parse(file = source, format='xml')
 
     def get_deprecated_classes(self, obsoleted_in_version=False):
 
@@ -144,7 +146,7 @@ class OntologyClassReader(object):
                     next_reason = self.obsoletes[prev_uri]['reason_for_obsolescence']
                 if next_uri in self.current_classes:
                     new_label = self.current_classes[next_uri]
-                    logger.warn("%s => %s" % (old_uri, self.obsoletes[old_uri]))
+                    #logger.warn("%s => %s" % (old_uri, self.obsoletes[old_uri]))
                     self.obsolete_classes[old_uri] = "Use %s label:%s (reason: %s)" % (next_uri, new_label, next_reason)
                 else:
                     # load the class
@@ -193,7 +195,6 @@ class OntologyClassReader(object):
             '''
             self.get_children(uri=uri)
 
-            # logger.debug("RDFLIB '%s' '%s'" % (uri, label))
         logger.debug("parsed %i classes"%count)
 
     def get_top_levels(self, base_class=None):
@@ -220,7 +221,6 @@ class OntologyClassReader(object):
         for c in self.rdf_graph.subjects(predicate=RDFS.subClassOf, object=disease_uri):
             cr = rdflib.resource.Resource(self.rdf_graph, c)
             label = str(cr.value(RDFS.label))
-            c_uri = str(cr.identifier)
             (prefix, namespace, id) = self.rdf_graph.namespace_manager.compute_qname(cr.identifier)
             self.children[uri].append({'code': id, 'label': label})
 
@@ -230,8 +230,7 @@ class OntologyClassReader(object):
         while next_uri in list(self.obsoletes.keys()):
             next_uri = self.obsoletes[next_uri]['new_uri']
         if next_uri in self.current_classes:
-            new_label = self.current_classes[next_uri]
-            logger.warn("%s => %s" % (old_uri, self.obsoletes[old_uri]))
+            #logger.warn("%s => %s" % (old_uri, self.obsoletes[old_uri]))
             return next_uri
         else:
             return None
@@ -282,15 +281,14 @@ class OntologyClassReader(object):
         return
 
     def parse_properties(self, rdf_node):
-        logger.debug("parse_properties for rdf_node: {}".format(rdf_node))
+        #logger.debug("parse_properties for rdf_node: {}".format(rdf_node))
         raw_properties = list(self.rdf_graph.predicate_objects(subject=rdf_node))
         rdf_properties = dict()
-        logger.debug("raw_properties for rdf_node: {}".format(rdf_node))
+        #logger.debug("raw_properties for rdf_node: {}".format(rdf_node))
         for index, property in enumerate(raw_properties):
-            logger.debug("{}. {}".format(index, property))
+            #logger.debug("{}. {}".format(index, property))
             property_name = str(property[0])
             property_value = str(property[1])
-            # rdf_properties[property_name].append(property_value)
             if property_name in rdf_properties:
                 rdf_properties[property_name].append(property_value)
             else:
