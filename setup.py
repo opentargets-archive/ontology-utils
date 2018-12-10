@@ -6,19 +6,20 @@ try:
 except ImportError:
     from distutils import setup
 
-
+pkg_dir = os.path.dirname(__file__)
 # importing __<vars>__ into the namespace
 #https://packaging.python.org/guides/single-sourcing-package-version/#single-sourcing-the-version
-with open('opentargets_ontologyutils/version.py') as fv:
+with open(os.path.join(pkg_dir, 'opentargets_ontologyutils', 'version.py')) as fv:
     exec(fv.read())
 
-long_description = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
+long_description = open(os.path.join(pkg_dir, "README.md")).read()
 
 setup(
     name=__pkgname__,
     version=__version__,
     description=__description__,
     long_description=long_description,
+    long_description_content_type='text/markdown; charset=UTF-8',
     author=__author__,
     author_email=__author_email__,
     url=__homepage__,
@@ -36,7 +37,7 @@ setup(
     data_files=[],
     scripts=[],
     classifiers=[
-        "License :: Apache 2",
+        "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
     ],
