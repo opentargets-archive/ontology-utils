@@ -1,55 +1,58 @@
 from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import re
-import os
-import urllib.request, urllib.error, urllib.parse
+
 import logging
-from datetime import datetime
-from opentargets_ontologyutils.ou_settings import Config
 
+import rdflib
 
-class HPODownloader(object):
+from opentargets_ontologyutils.rdf_utils import OntologyClassReader
 
-    def __init__(self):
-        pass
+logger = logging.getLogger(__name__)
 
-    def download(self):
-        now = datetime.utcnow()
-        today = datetime.strptime("{:%Y-%m-%d}".format(datetime.now()), '%Y-%m-%d')
+HPO_TAS = [
+    "http://purl.obolibrary.org/obo/HP_0005386", #"behavior/neurological phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005375", #"adipose tissue phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005385", #"cardiovascular system phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005384", #"cellular phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005382", #"craniofacial phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005381", #"digestive/alimentary phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005380", #"embryo phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005379", #"endocrine/exocrine phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005378", #"growth/size/body region phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005377", #"hearing/vestibular/ear phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005397", #"hematopoietic system phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005376", #"homeostasis/metabolism phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005387", #"immune system phenotype",
+    "http://purl.obolibrary.org/obo/HP_0010771", #"integument phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005371", #"limbs/digits/tail phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005370", #"liver/biliary system phenotype",
+    "http://purl.obolibrary.org/obo/HP_0010768", #"mortality/aging",
+    "http://purl.obolibrary.org/obo/HP_0005369", #"muscle phenotype",
+    "http://purl.obolibrary.org/obo/HP_0002006", #"neoplasm",
+    "http://purl.obolibrary.org/obo/HP_0003631", #"nervous system phenotype",
+    "http://purl.obolibrary.org/obo/HP_0002873", #"normal phenotype",
+    "http://purl.obolibrary.org/obo/HP_0001186", #"pigmentation phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005367", #"renal/urinary system phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005389", #"reproductive system phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005388", #"respiratory system phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005390", #"skeleton phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005394", #"taste/olfaction phenotype",
+    "http://purl.obolibrary.org/obo/HP_0005391", #"vision/eye phenotype"
+]
 
-        for dir in [Config.HPO_DIRECTORY, Config.HPO_OBO_DIRECTORY, Config.HPO_ANNOTATIONS_DIRECTORY]:
-            if not os.path.exists(dir):
-                os.makedirs(dir)
+#TODO this should be a static method
+def get_hpo(self, uri):
+    '''
+    Load HPO to accept phenotype terms that are not in EFO
+    :return:
+    '''
+    obj = OntologyClassReader()
 
-        for url in Config.HPO_URIS:
-            directory = Config.HPO_ANNOTATIONS_DIRECTORY
-            filename = re.match("^.+/([^/]+)$", url).groups()[0]
-            print(url)
-            #match = re.match("^.+/([^/]+)$", url)
-            if re.match(Config.HPO_OBO_MATCH, url):
-                directory = Config.HPO_OBO_DIRECTORY
-            elif re.match(Config.HPO_ANNOTATIONS_MATCH, url):
-                directory = Config.HPO_ANNOTATIONS_DIRECTORY
+    obj.load_ontology_graph(uri)
 
-            print(filename)
-            # get a new version of HPO
-            req = urllib.request.Request(url)
+    base_class = 'http://purl.obolibrary.org/obo/HP_0000118'
+    obj.load_ontology_classes(base_class=base_class)
+    obj.get_deprecated_classes()
+    obj.get_top_levels(base_class= base_class)
 
-            try:
-                response = urllib.request.urlopen(req)
-
-                # Open our local file for writing
-                local_file = open('%s/%s'%(directory, filename), "wb")
-                #Write to our local file
-                local_file.write(response.read())
-                local_file.close()
-
-                logging.info("downloaded %s"%filename)
-
-            #handle errors
-            except urllib.error.HTTPError as e:
-                print("HTTP Error:",e.code , url)
-            except urllib.error.URLError as e:
-                print("URL Error:",e.reason , url)
+    obj.rdf_graph = None
+    return obj

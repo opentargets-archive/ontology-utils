@@ -30,7 +30,7 @@ setup(
     platforms=['any'],
     #make sure this matches requirements.txt
     install_requires=[
-        'requests','numpy','rdflib','configparser','future'
+        'requests-file','rdflib','future'
       ],
     include_package_data=True,
     entry_points={},
@@ -42,6 +42,6 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     #make sure this matches requirements.txt
-    extras_require={'dev': ['pytest-cov','codecov','tox']}
+    extras_require={'dev': ['pytest-cov', 'pylint','codecov','tox']}
 )
 

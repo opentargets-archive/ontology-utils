@@ -1,7 +1,5 @@
 #make sure this matches setup.py install_requires
 
-numpy
-requests
+requests-file
 rdflib
-configparser
 future
