@@ -42,6 +42,6 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     #make sure this matches requirements.txt
-    extras_require={'dev': ['pytest-cov', 'pylint','codecov','tox']}
+    extras_require={'dev': ['pytest>=4.0.0,<4.1.0','pytest-cov', 'pylint','codecov','tox']}
 )
 
