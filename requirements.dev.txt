@@ -1,6 +1,11 @@
 #make sure this matches setup.py extras_require
 
+#transitive pin on pytest to avoid 4.1.0 which is broken
+pytest>=4.0.0,<4.1.0
 pytest-cov
 pylint
 tox
+
 codecov
+
+pipdeptree
