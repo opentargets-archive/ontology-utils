@@ -2,5 +2,9 @@
 
 pytest-cov
 pylint
+
+#https://github.com/pytest-dev/pytest/issues/3753#issuecomment-411121588
+pluggy>=0.7
 tox
+
 codecov
