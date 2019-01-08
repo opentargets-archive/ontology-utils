@@ -7,3 +7,5 @@ pylint
 tox
 
 codecov
+
+pipdeptree
