@@ -40,19 +40,18 @@ HPO_TAS = [
 ]
 
 #TODO this should be a static method
-def get_hpo(self, uri):
+def get_hpo(ocr, uri):
     '''
     Load HPO to accept phenotype terms that are not in EFO
     :return:
     '''
-    obj = OntologyClassReader()
 
-    obj.load_ontology_graph(uri)
+    ocr.load_ontology_graph(uri)
 
     base_class = 'http://purl.obolibrary.org/obo/HP_0000118'
-    obj.load_ontology_classes(base_class=base_class)
-    obj.get_deprecated_classes()
-    obj.get_top_levels(base_class= base_class)
+    ocr.load_ontology_classes(base_class=base_class)
+    ocr.get_deprecated_classes()
+    ocr.get_top_levels(base_class= base_class)
 
-    obj.rdf_graph = None
-    return obj
+    ocr.rdf_graph = None
+    return ocr
