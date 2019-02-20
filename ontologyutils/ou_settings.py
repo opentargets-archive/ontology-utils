@@ -77,6 +77,7 @@ class OUConfig(object):
     ONTOLOGYUTILS_CONFIG_FILE = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'resources'), 'ontology_config.ini')
     if 'ONTOLOGYUTILS_CONFIG_FILE' in os.environ:
         ONTOLOGYUTILS_CONFIG_FILE = os.environ['ONTOLOGYUTILS_CONFIG_FILE']
+    print(ONTOLOGYUTILS_CONFIG_FILE)
 
     ONTOLOGY_CONFIG = configparser.ConfigParser()
     ONTOLOGY_CONFIG.read(ONTOLOGYUTILS_CONFIG_FILE)
