@@ -4,7 +4,7 @@ import sys
 import optparse
 import logging
 from ontologyutils.similarity import PhenotypeLookup, Diseases
-from ontologyutils.ou_settings import Config
+from ontologyutils.ou_settings import OUConfig
 
 hpo = None
 ICs = dict()
@@ -13,9 +13,9 @@ micas = dict()
 def main():
 
     parser = optparse.OptionParser()
-    parser.add_option('-p', '--hpo', type='string', default=Config.HPO_FILES['obo'], dest='hpoFilename')
-    parser.add_option('-r', '--rd', type='string', default=Config.HPO_FILES['rare_phenotype_annotation'], dest='rdFilename')
-    parser.add_option('-c', '--cd', type='string', default=Config.HPO_FILES['common_phenotype_annotation'], dest='cdFilename')
+    parser.add_option('-p', '--hpo', type='string', default=OUConfig.HPO_FILES['obo'], dest='hpoFilename')
+    parser.add_option('-r', '--rd', type='string', default=OUConfig.HPO_FILES['rare_phenotype_annotation'], dest='rdFilename')
+    parser.add_option('-c', '--cd', type='string', default=OUConfig.HPO_FILES['common_phenotype_annotation'], dest='cdFilename')
     #parser.add_option('-b', '--backup', type='string', default=Config.HPO_FILES['ic_backup'], dest='backupFilename')
     parser.add_option('-s', '--rdset', type='string', default='OMIM', dest='rdset')
 
@@ -35,10 +35,10 @@ def main():
         diseases.load_mesh_diseases(options.cdFilename)
         diseases.compute_ICs()
         diseases.compute_MICAs()
-        diseases.write_backup(Config.SIM_DISEASES_BACKUP, Config.SIM_MICAS_BACKUP)
+        diseases.write_backup(OUConfig.SIM_DISEASES_BACKUP, OUConfig.SIM_MICAS_BACKUP)
         #sys.exit(1)
     else:
-        diseases.read_backup(Config.SIM_DISEASES_BACKUP, Config.SIM_MICAS_BACKUP)
+        diseases.read_backup(OUConfig.SIM_DISEASES_BACKUP, OUConfig.SIM_MICAS_BACKUP)
 
         print(diseases.MICAs[0,0])
         print(diseases.MICAs[500, 600])

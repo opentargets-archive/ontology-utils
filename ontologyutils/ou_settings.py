@@ -50,7 +50,7 @@ env_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'env.ini')
 if os.path.isfile(env_file):
     iniparser.read(env_file)
 
-class Config(object):
+class OUConfig(object):
     # print "OS SEP %s %s"%(os.sep, os.path.sep)
     HAS_PROXY = iniparser.has_section('proxy')
     if HAS_PROXY:
@@ -72,6 +72,7 @@ class Config(object):
     elif 'ONTOLOGYUTILS_CACHE' in os.environ:
         CACHE_DIRECTORY = os.environ['ONTOLOGYUTILS_CACHE']
 
+    print("PASRSING ONTOLOGY OU SETTINGS")
 
     ONTOLOGY_CONFIG = configparser.ConfigParser()
     ONTOLOGY_CONFIG.read(file_or_resource(u'ontology_config.ini'))
