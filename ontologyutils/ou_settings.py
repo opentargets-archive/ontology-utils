@@ -47,6 +47,7 @@ def file_or_resource(fname=None):
 
 iniparser = configparser.ConfigParser()
 env_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'env.ini')
+print(env_file)
 if os.path.isfile(env_file):
     iniparser.read(env_file)
 
