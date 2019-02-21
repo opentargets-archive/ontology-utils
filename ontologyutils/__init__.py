@@ -31,7 +31,7 @@ class Ontology(object):
             value = line.split(': ',1)[1]
             if re.match('^.+!{1}.+$', value):
                 value = value.split("!")[0].strip()
-            #print tag + " => " + value + "\n"
+            #self.logger.debug(tag + " => " + value + "\n")
             # property_value: http://www.ebi.ac.uk/efo/OMIM_definition_citation OMIM:600807 xsd:string
             if tag == 'xref':
                 tag = 'hasDbXref'
@@ -87,7 +87,7 @@ class Ontology(object):
                     for property_key in filtered_keys:
 
                         reverse_key = 'r_' + property_key
-                        #print('Current term:', termID, property_key)
+                        self.logger.debug('Current term:', termID, property_key)
 
                         if property_key == 'is_a':
                             termParents = [p.split()[0] for p in term[property_key]]
@@ -109,8 +109,8 @@ class Ontology(object):
                             for p in term[property_key]:
                                 if re.match("part_of|regulates|negatively_regulates|positively_regulates|happens_during|starts_during|occurs_in", p):
                                 #if any(map(lambda x: p.startswith(x), ['part_of', 'regulates', 'negatively_regulates', 'positively_regulates', 'happens_during', 'starts_during', 'occurs_in'])):
-                                    #print('=========='.join(p.split()))
-                                    #print(p)
+                                    #self.logger.debug('=========='.join(p.split()))
+                                    #self.logger.debug(p)
                                     split_array = p.split()
                                     if len(split_array) == 2:
                                         (property_key, object_id) = split_array
@@ -128,21 +128,21 @@ class Ontology(object):
                                             self.terms[object_id]['dag'][reverse_key] = []
                                         self.terms[object_id]['dag'][reverse_key].append(termID)
                                     else:
-                                        print("split function not supported for axiom: ", p)
+                                        self.logger.error("split function not supported for axiom: " + p)
                 else:
                     break
 
 
     def getTermsByDbXref(self, xref):
         result = None
-        #print "{0}\n".format()
+        #self.logger.debug("{0}\n".format())
         if (xref in self.dbxrefs):
             result = self.dbxrefs[xref]
         return result
 
     def getTermById(self, id):
         result = None
-        #print "{0}\n".format()
+        #self.logger.debug("{0}\n".format())
         if (id in self.terms):
             result = self.terms[id]
         elif (id in self.altids):

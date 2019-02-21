@@ -39,8 +39,8 @@ def main():
                         efo_name = efo_name.split("{")[0]
                     writer.writerow([id, efo_uri, efo_name])
                 except KeyError:
-                    print('No Tags found for id %s'%(id))
-                    print(json.dumps(ontology.terms[id], indent=2))
+                    logging.error('No Tags found for id %s'%(id))
+                    logging.error(json.dumps(ontology.terms[id], indent=2))
                     break
 
 if __name__ == "__main__":

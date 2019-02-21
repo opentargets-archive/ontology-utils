@@ -30,14 +30,14 @@ class HPODownloader(object):
         for url in Config.HPO_URIS:
             directory = Config.HPO_ANNOTATIONS_DIRECTORY
             filename = re.match("^.+/([^/]+)$", url).groups()[0]
-            print(url)
+            logging.debug(url)
             #match = re.match("^.+/([^/]+)$", url)
             if re.match(Config.HPO_OBO_MATCH, url):
                 directory = Config.HPO_OBO_DIRECTORY
             elif re.match(Config.HPO_ANNOTATIONS_MATCH, url):
                 directory = Config.HPO_ANNOTATIONS_DIRECTORY
 
-            print(filename)
+            logging.debug(filename)
             # get a new version of HPO
             req = urllib.request.Request(url)
 
@@ -54,6 +54,6 @@ class HPODownloader(object):
 
             #handle errors
             except urllib.error.HTTPError as e:
-                print("HTTP Error:",e.code , url)
+                logging.error("HTTP Error:",e.code , url)
             except urllib.error.URLError as e:
-                print("URL Error:",e.reason , url)
+                logging.error("URL Error:",e.reason , url)

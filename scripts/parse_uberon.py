@@ -16,7 +16,7 @@ def main():
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
     ontology = onto.Ontology.fromOBOFile(options.ontoFilename)
-    print('ontology parsed')
+    logging.info('ontology parsed')
 
     c = 0
     for id in ontology.terms:
@@ -37,7 +37,7 @@ def main():
             c+=1
             for path in paths:
                 if 'GO:0006955' in path:
-                    print(id, ontology.terms[id]['tags']['name'][0], '; '.join(path))
+                    logging.info(id, ontology.terms[id]['tags']['name'][0], '; '.join(path))
                     break
 
             #if c > 100:
