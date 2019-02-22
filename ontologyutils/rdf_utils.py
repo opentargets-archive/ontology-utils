@@ -237,6 +237,7 @@ class OntologyClassReader(object):
         self.classes_paths = dict()
         self.obsoletes = dict()
         self.children = dict()
+        self.logger = logging.getLogger(__name__)
 
     def load_ontology_graph(self, uri):
         """Loads the ontology from a URI in a RDFLib graph.
@@ -276,7 +277,7 @@ class OntologyClassReader(object):
             label = str(ont_label)
             location_uri = str(d_node)
             location_label = str(d_label)
-            print("%s %s %s %s" % (uri, label, location_uri, location_label))
+            self.logger.info("%s %s %s %s" % (uri, label, location_uri, location_label))
             if uri not in self.disease_locations:
                 self.disease_locations[uri] = dict()
             if location_uri not in self.disease_locations[uri]:
@@ -307,7 +308,7 @@ class OntologyClassReader(object):
             label = str(ont_label)
             location_uri = str(d_node)
             location_label = str(d_label)
-            print("%s %s %s %s" % (uri, label, location_uri, location_label))
+            self.logger.info("%s %s %s %s" % (uri, label, location_uri, location_label))
             if uri not in self.disease_locations:
                 self.disease_locations[uri] = dict()
             if location_uri not in self.disease_locations[uri]:
@@ -601,16 +602,16 @@ class OntologyClassReader(object):
         """
         logger.debug("load_efo_classes...")
 
-        print("load EFO classes...")
+        self.logger.info("load EFO classes...")
 
         self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'efo'))
 
         if with_uberon == True:
             logger.debug("load Uberon classes...")
-            print("load Uberon classes...")
+            self.logger.info("load Uberon classes...")
             self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'uberon'))
 
-        print("Done")
+            self.logger.info("Done")
         if lightweight == True:
             return
 
@@ -763,14 +764,14 @@ class OntologyClassReader(object):
         self.get_children(phenotypic_abnormality_uri)
 
         for child in self.children[phenotypic_abnormality_uri]:
-            print("%s %s..."%(child['code'], child['label']))
+            self.logger.info("%s %s..."%(child['code'], child['label']))
             uri = "http://purl.obolibrary.org/obo/" + child['code']
             uriref = URIRef(uri)
             self.rdf_graph.remove((uriref, None, phenotypic_abnormality_uriref))
             self.load_ontology_classes(base_class=uri)
             self.get_classes_paths(root_uri=uri, level=0)
             self.get_deprecated_classes()
-            print(len(self.current_classes))
+            self.logger.info(len(self.current_classes))
 
     def load_mammalian_phenotype_ontology(self):
         """
@@ -792,13 +793,13 @@ class OntologyClassReader(object):
         self.get_children(mp_root_uri)
 
         for child in self.children[mp_root_uri]:
-            print("%s %s..."%(child['code'], child['label']))
+            self.logger.info("%s %s..."%(child['code'], child['label']))
             uri = "http://purl.obolibrary.org/obo/" + child['code']
             uriref = URIRef(uri)
             self.rdf_graph.remove((uriref, None, mp_root_uriref))
             self.load_ontology_classes(base_class=uri)
             self.get_classes_paths(root_uri=uri, level=0)
-            print(len(self.current_classes))
+            self.logger.info(len(self.current_classes))
 
     def load_efo_omim_xrefs(self):
         '''
@@ -1036,7 +1037,6 @@ class PhenotypeSlim(object):
                         results = self.sparql.query().convert()
                         n = 3
                     except SPARQLWrapper.SPARQLExceptions.EndPointNotFound as e:
-                        print(e)
                         self._logger.error(e)
                         if n > 2:
                             raise e
@@ -1059,8 +1059,8 @@ class PhenotypeSlim(object):
                     ''' Put all the ancestors to the phenotype map '''
                     if ancestor not in self.phenotype_map[direct_child]['superclasses']:
                         self.phenotype_map[direct_child]['superclasses'].append(ancestor)
-                        print("%i %s %s (direct child is %s %s)"%(count, parent_label, ancestor, direct_child_label, direct_child))
-                        print("---------")
+                        self._logger.info("%i %s %s (direct child is %s %s)"%(count, parent_label, ancestor, direct_child_label, direct_child))
+                        self._logger.info("---------")
                     #print "%i %s %s (direct child is %s %s)"%(count, parent_label, ancestor, direct_child_label, direct_child)
 
 
@@ -1083,7 +1083,7 @@ class PhenotypeSlim(object):
         for p in l:
             if p not in self.phenotype_excluded:
                 self.phenotype_excluded.add(p)
-                print("Excluding %s"%p)
+                self._logger.info("Excluding %s"%p)
                 # get parents
                 sparql_query = DIRECT_ANCESTORS
                 self.sparql.setQuery(sparql_query%(p, p))
