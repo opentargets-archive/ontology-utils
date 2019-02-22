@@ -77,4 +77,4 @@ def load_evidence_classes(ocr, uri_so, uri_eco):
         'http://purl.obolibrary.org/obo/SO_0000110', 
         'http://purl.obolibrary.org/obo/SO_0001060' ]:
         ocr.load_ontology_classes(base_class=base_class)
-        ocr.get_classes_paths(root_uri=base_class, level=0)
+        ocr.classes_paths = ocr.get_classes_paths(root_uri=base_class, level=0)

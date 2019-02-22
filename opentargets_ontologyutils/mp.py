@@ -4,7 +4,7 @@ import logging
 
 import rdflib
 
-from opentargets_ontologyutils.rdf_utils import OntologyClassReader
+from opentargets_ontologyutils.rdf_utils import OntologyClassReader,merge_classes_paths
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +15,7 @@ def load_mammalian_phenotype_ontology(ocr, uri):
     """
     logger.debug("load_mammalian_phenotype_ontology...")
     ocr.load_ontology_graph(uri)
-
-    all_ns = [n for n in ocr.rdf_graph.namespace_manager.namespaces()]
+    ocr.get_deprecated_classes()
 
     '''
     Detach the anatomical system from the mammalian phenotype node
@@ -27,13 +26,16 @@ def load_mammalian_phenotype_ontology(ocr, uri):
     mp_root_uriref = rdflib.URIRef(mp_root_uri)
     ocr.get_children(mp_root_uri)
 
+    ocr.classes_paths_bases = {}
     for child in ocr.children[mp_root_uri]:
-        print("%s %s..."%(child['code'], child['label']))
         uri = "http://purl.obolibrary.org/obo/" + child['code']
         uriref = rdflib.URIRef(uri)
         ocr.rdf_graph.remove((uriref, None, mp_root_uriref))
         ocr.load_ontology_classes(base_class=uri)
-        ocr.get_classes_paths(root_uri=uri, level=0)
-        print(len(ocr.current_classes))
+        ocr.classes_paths_bases[uri] = ocr.get_classes_paths(root_uri=uri, level=0)
 
-    ocr.get_deprecated_classes()
+    #combine each anatomical system into a combined collection
+    ocr.classes_paths = {}
+    for anatomical_system in ocr.classes_paths_bases:
+        ocr.classes_paths = merge_classes_paths(ocr.classes_paths, 
+            ocr.classes_paths_bases[anatomical_system])
