@@ -22,7 +22,7 @@ from datetime import date
 from ontologyutils.ou_settings import OUConfig
 
 
-__copyright__ = "Copyright 2014-2018, Open Targets"
+__copyright__ = "Copyright 2014-2019, Open Targets"
 __credits__ = []
 __license__ = "Apache 2.0"
 __version__ = ""

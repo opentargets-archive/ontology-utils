@@ -1,5 +1,5 @@
 '''
-Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
+Copyright 2014-2019 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
 
 This software was developed as part of the Open Targets project. For more information please see: http://www.opentargets.org
 
@@ -21,7 +21,7 @@ import os
 import configparser
 import pkg_resources as res
 
-__copyright__ = "Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute"
+__copyright__ = "Copyright 2014-2019 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute"
 __credits__ = ["Gautier Koscielny"]
 __license__ = "Apache 2.0"
 __version__ = "0.4"
