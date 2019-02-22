@@ -19,7 +19,7 @@ from rdflib.namespace import RDF, RDFS
 from SPARQLWrapper import SPARQLWrapper, JSON
 from tqdm import tqdm
 from datetime import date
-from ontologyutils.ou_settings import Config
+from ontologyutils.ou_settings import OUConfig
 
 
 __copyright__ = "Copyright 2014-2018, Open Targets"
@@ -557,14 +557,14 @@ class OntologyClassReader(object):
         return rdf_properties
 
     def _get_from_pickled_file_cache(self, file_id):
-        file_path = os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), file_id+'.pck')
+        file_path = os.path.join(OUConfig.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), file_id + '.pck')
         if os.path.isfile(file_path):
             return pickle.load(open(file_path, 'rb'))
 
     def _set_in_pickled_file_cache(self, obj, file_id):
-        if not os.path.isdir(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'))):
-            os.makedirs(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir')))
-        file_path = os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), file_id+'.pck')
+        if not os.path.isdir(os.path.join(OUConfig.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'))):
+            os.makedirs(os.path.join(OUConfig.ONTOLOGY_CONFIG.get('pickle', 'cache_dir')))
+        file_path = os.path.join(OUConfig.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), file_id + '.pck')
         pickle.dump(obj,
                     open(file_path, 'wb'),)
 
@@ -574,7 +574,7 @@ class OntologyClassReader(object):
         """
         logger.debug("load_hpo_classes...")
 
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'hpo'))
+        self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'hpo'))
 
         base_class = 'http://purl.obolibrary.org/obo/HP_0000118'
         self.load_ontology_classes(base_class=base_class)
@@ -587,7 +587,7 @@ class OntologyClassReader(object):
         """
         logger.debug("load_mp_classes...")
 
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
+        self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'mp'))
         base_class = 'http://purl.obolibrary.org/obo/MP_0000001'
         self.load_ontology_classes(base_class= base_class)
         self.get_deprecated_classes()
@@ -603,12 +603,12 @@ class OntologyClassReader(object):
 
         print("load EFO classes...")
 
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'efo'))
+        self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'efo'))
 
         if with_uberon == True:
             logger.debug("load Uberon classes...")
             print("load Uberon classes...")
-            self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'uberon'))
+            self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'uberon'))
 
         print("Done")
         if lightweight == True:
@@ -681,7 +681,7 @@ class OntologyClassReader(object):
            Status: production
         """
         logger.debug("load_open_targets_disease_ontology...")
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'efo'))
+        self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'efo'))
         all_ns = [n for n in self.rdf_graph.namespace_manager.namespaces()]
 
         self.get_deprecated_classes(obsoleted_in_version=True)
@@ -749,7 +749,7 @@ class OntologyClassReader(object):
         """
         logger.debug("load_human_phenotype_ontology...")
         #self.load_hpo_classes()
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'hpo'))
+        self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'hpo'))
 
         all_ns = [n for n in self.rdf_graph.namespace_manager.namespaces()]
 
@@ -778,7 +778,7 @@ class OntologyClassReader(object):
             Status: production
         """
         logger.debug("load_mammalian_phenotype_ontology...")
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
+        self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'mp'))
 
         all_ns = [n for n in self.rdf_graph.namespace_manager.namespaces()]
 
@@ -835,8 +835,8 @@ class OntologyClassReader(object):
         Loads evidence from ECO, SO and the Open Targets evidence classes
         :return:
         '''
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'so'))
-        self.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'eco'))
+        self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'so'))
+        self.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'eco'))
 
         evidence_uri = URIRef('http://purl.obolibrary.org/obo/ECO_0000000')
 
@@ -919,16 +919,16 @@ class DiseaseUtils(object):
         fh.close()
 
     def check_disease_phenotypes_cache(self):
-        return os.path.isfile(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), "disease_phenotypes.pck"))
+        return os.path.isfile(os.path.join(OUConfig.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), "disease_phenotypes.pck"))
 
     def read_disease_phenotypes_cache(self):
-        return pickle.load( open( os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'),"disease_phenotypes.pck"), 'rb'))
+        return pickle.load(open(os.path.join(OUConfig.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), "disease_phenotypes.pck"), 'rb'))
 
     def update_disease_phenotypes_cache(self, disease_phenotypes):
-        if not os.path.isdir(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'))):
-            os.makedirs(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir')))
+        if not os.path.isdir(os.path.join(OUConfig.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'))):
+            os.makedirs(os.path.join(OUConfig.ONTOLOGY_CONFIG.get('pickle', 'cache_dir')))
         pickle.dump(disease_phenotypes,
-            open(os.path.join(Config.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), "disease_phenotypes.pck"), 'wb'),
+                    open(os.path.join(OUConfig.ONTOLOGY_CONFIG.get('pickle', 'cache_dir'), "disease_phenotypes.pck"), 'wb'),
                     protocol=pickle.HIGHEST_PROTOCOL)
 
     def write_disease_phenotypes(self, ontologyreader=None, filename=None):
@@ -962,11 +962,11 @@ class DiseaseUtils(object):
 
         # load HPO:
         logger.debug("Merge HPO graph")
-        ontologyclassreader.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'hpo'))
+        ontologyclassreader.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'hpo'))
         logger.debug("Merge MP graph")
-        ontologyclassreader.load_ontology_graph(Config.ONTOLOGY_CONFIG.get('uris', 'mp'))
+        ontologyclassreader.load_ontology_graph(OUConfig.ONTOLOGY_CONFIG.get('uris', 'mp'))
 
-        for key, uri in Config.ONTOLOGY_CONFIG.items('disease_phenotypes_uris'):
+        for key, uri in OUConfig.ONTOLOGY_CONFIG.items('disease_phenotypes_uris'):
             logger.debug("merge phenotypes from %s" % uri)
             ontologyclassreader.rdf_graph.parse(uri, format='xml')
 
@@ -1112,7 +1112,7 @@ class PhenotypeSlim(object):
                         datasource = ''.join(user.split('_')[1:])
                         user = user.split('_')[0]
                     else:
-                        datasource = Config.DATASOURCE_INTERNAL_NAME_TRANSLATION_REVERSED[user]
+                        datasource = OUConfig.DATASOURCE_INTERNAL_NAME_TRANSLATION_REVERSED[user]
                     release_date = date(int(year), int(month), int(day))
 
                     if user not in self._remote_filenames:
@@ -1139,7 +1139,7 @@ class PhenotypeSlim(object):
 
     def create_phenotype_slim_from_selection(self):
 
-        for url in Config.PHENOTYPE_SLIM_INPUT_URLS:
+        for url in OUConfig.PHENOTYPE_SLIM_INPUT_URLS:
             response = requests.get(url)
             self._logger.info("Read url %s - response code %s" % (url, response.code))
             lines = response.readlines()

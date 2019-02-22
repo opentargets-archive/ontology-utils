@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 from datetime import datetime
-from ontologyutils.ou_settings import Config
+from ontologyutils.ou_settings import OUConfig
 
 __author__ = 'gautierk'
 
@@ -24,12 +24,12 @@ class EFODownloader(object):
         now = datetime.utcnow()
         today = datetime.strptime("{:%Y-%m-%d}".format(datetime.now()), '%Y-%m-%d')
 
-        for dir in [Config.EFO_DIRECTORY, Config.EFO_OBO_DIRECTORY]:
+        for dir in [OUConfig.EFO_DIRECTORY, OUConfig.EFO_OBO_DIRECTORY]:
             if not os.path.exists(dir):
                 os.makedirs(dir)
 
-        for url in Config.EFO_URIS:
-            directory = Config.EFO_OBO_DIRECTORY
+        for url in OUConfig.EFO_URIS:
+            directory = OUConfig.EFO_OBO_DIRECTORY
             filename = re.match("^.+/([^/]+)\?format=raw$", url).groups()[0]
             print(filename)
             # get a new version of EFO

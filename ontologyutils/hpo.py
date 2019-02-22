@@ -7,7 +7,7 @@ import os
 import urllib.request, urllib.error, urllib.parse
 import logging
 from datetime import datetime
-from ontologyutils.ou_settings import Config
+from ontologyutils.ou_settings import OUConfig
 
 __author__ = 'gautierk'
 
@@ -23,19 +23,19 @@ class HPODownloader(object):
         now = datetime.utcnow()
         today = datetime.strptime("{:%Y-%m-%d}".format(datetime.now()), '%Y-%m-%d')
 
-        for dir in [Config.HPO_DIRECTORY, Config.HPO_OBO_DIRECTORY, Config.HPO_ANNOTATIONS_DIRECTORY]:
+        for dir in [OUConfig.HPO_DIRECTORY, OUConfig.HPO_OBO_DIRECTORY, OUConfig.HPO_ANNOTATIONS_DIRECTORY]:
             if not os.path.exists(dir):
                 os.makedirs(dir)
 
-        for url in Config.HPO_URIS:
-            directory = Config.HPO_ANNOTATIONS_DIRECTORY
+        for url in OUConfig.HPO_URIS:
+            directory = OUConfig.HPO_ANNOTATIONS_DIRECTORY
             filename = re.match("^.+/([^/]+)$", url).groups()[0]
             logging.debug(url)
             #match = re.match("^.+/([^/]+)$", url)
-            if re.match(Config.HPO_OBO_MATCH, url):
-                directory = Config.HPO_OBO_DIRECTORY
-            elif re.match(Config.HPO_ANNOTATIONS_MATCH, url):
-                directory = Config.HPO_ANNOTATIONS_DIRECTORY
+            if re.match(OUConfig.HPO_OBO_MATCH, url):
+                directory = OUConfig.HPO_OBO_DIRECTORY
+            elif re.match(OUConfig.HPO_ANNOTATIONS_MATCH, url):
+                directory = OUConfig.HPO_ANNOTATIONS_DIRECTORY
 
             logging.debug(filename)
             # get a new version of HPO

@@ -50,7 +50,7 @@ env_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'env.ini')
 if os.path.isfile(env_file):
     iniparser.read(env_file)
 
-class Config(object):
+class OUConfig(object):
     # print "OS SEP %s %s"%(os.sep, os.path.sep)
     HAS_PROXY = iniparser.has_section('proxy')
     if HAS_PROXY:

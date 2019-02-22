@@ -2,7 +2,7 @@ import re
 import ontologyutils as onto
 import optparse
 import logging
-from ontologyutils.ou_settings import Config
+from ontologyutils.ou_settings import OUConfig
 import csv
 import json
 import sys
@@ -10,7 +10,7 @@ import sys
 def main():
 
     parser = optparse.OptionParser()
-    parser.add_option('-i', '--input', type='string', default=Config.UBERON_FILES['obo'], dest='ontoFilename')
+    parser.add_option('-i', '--input', type='string', default=OUConfig.UBERON_FILES['obo'], dest='ontoFilename')
 
     options, args = parser.parse_args()
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)

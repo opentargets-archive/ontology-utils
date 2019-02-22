@@ -5,12 +5,12 @@ import json
 import logging
 import ontologyutils as onto
 import ontologyutils.efo as efo
-from ontologyutils.ou_settings import Config
+from ontologyutils.ou_settings import OUConfig
 
 
 def main():
     parser = optparse.OptionParser()
-    parser.add_option('-i', '--input', type='string', default=Config.EFO_FILES['obo'], dest='efoFilename')
+    parser.add_option('-i', '--input', type='string', default=OUConfig.EFO_FILES['obo'], dest='efoFilename')
     parser.add_option('-o', '--output', type='string', default='/tmp/output.tsv', dest='outputFilename')
 
     options, args = parser.parse_args()
