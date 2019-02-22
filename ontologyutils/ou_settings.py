@@ -72,9 +72,15 @@ class OUConfig(object):
     elif 'ONTOLOGYUTILS_CACHE' in os.environ:
         CACHE_DIRECTORY = os.environ['ONTOLOGYUTILS_CACHE']
 
+    print("PARSING ONTOLOGY OU SETTINGS")
+    ONTOLOGYUTILS_CONFIG_FILE = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'resources'),
+                                             'ontology_config.ini')
+    if 'ONTOLOGYUTILS_CONFIG_FILE' in os.environ:
+        ONTOLOGYUTILS_CONFIG_FILE = os.environ['ONTOLOGYUTILS_CONFIG_FILE']
+    print(ONTOLOGYUTILS_CONFIG_FILE)
 
     ONTOLOGY_CONFIG = configparser.ConfigParser()
-    ONTOLOGY_CONFIG.read(file_or_resource(u'ontology_config.ini'))
+    ONTOLOGY_CONFIG.read(file_or_resource(ONTOLOGYUTILS_CONFIG_FILE))
     HPO_DIRECTORY = '%s/hpo'%CACHE_DIRECTORY
     HPO_OBO_DIRECTORY = '%s/obo'%HPO_DIRECTORY
     HPO_ANNOTATIONS_DIRECTORY = '%s/annotations'%HPO_DIRECTORY

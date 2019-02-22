@@ -12,12 +12,21 @@ Using python's pip installer:
 pip install git+https://github.com/opentargets/ontology-utils.git#egg=ontologyutils
 ```
 
+You have to set 2 variables, one to point to a cache where all the OBO files will reside (so that you can run locally) 
+```
+export ONTOLOGYUTILS_CACHE=$HOME/Documents/.ontologycache
+```
+and a variable to point to a local configuration file to read the latest OWL files from the Internet.
+```
+export ONTOLOGYUTILS_CONFIG_FILE=resources/ontology_config.ini
+```
+
 # Author
 
 Gautier Koscielny
 
 # License
-Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
+Copyright 2014-2019 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
 
 This software was developed as part of the Open Targets project. For more information please see: http://www.opentargets.org
 
