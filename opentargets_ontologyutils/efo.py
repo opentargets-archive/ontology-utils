@@ -30,7 +30,7 @@ def load_open_targets_disease_ontology(ocr, efo_uri):
             'http://www.ifomis.org/bfo/1.1/snap#Function']:
 
         ocr.load_ontology_classes(base_class=root)
-    logger.debug("Found %d classes", len(ocr.current_classes.key()))
+    logger.debug("Found %d classes", len(ocr.current_classes.keys()))
 
 
     therapeutic_areas = tuple(find_therapeutic_areas(ocr.rdf_graph))
