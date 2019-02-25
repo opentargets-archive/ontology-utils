@@ -34,7 +34,7 @@ def load_open_targets_disease_ontology(ocr, efo_uri):
 
 
     therapeutic_areas = tuple(find_therapeutic_areas(ocr.rdf_graph))
-    logger.debug("Found therapeutic areas: %s", therapeutic_areas)
+    logger.debug("Found %d therapeutic areas", len(therapeutic_areas))
 
     #for each therapeutic area, calculate the paths and parents
     ocr.classes_paths_bases = {}
