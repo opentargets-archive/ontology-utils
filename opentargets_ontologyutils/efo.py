@@ -48,9 +48,9 @@ def load_open_targets_disease_ontology(ocr, efo_uri):
             ocr.classes_paths_bases[therapeutic_area])
 
     #combine a dictionary of which therapeutic areas each term is in
-    ocr.therapeutic_labels = collections.defaultdict(tuple)
+    ocr.therapeutic_labels = collections.defaultdict(list)
     for therapeutic_area in ocr.classes_paths_bases:
-        label = ocr.classes_paths_bases[therapeutic_area]['labels'][-1]
+        label = ocr.classes_paths_bases[therapeutic_area][therapeutic_area]['labels'][-1]
         for uri in ocr.classes_paths_bases[therapeutic_area]:
             ocr.therapeutic_labels[uri].append(label)
 
@@ -63,6 +63,7 @@ Generator of the therapeutic areas labelled in the rdf graph of efo
 def find_therapeutic_areas(rdf_graph):
     in_subset = rdflib.term.URIRef('http://www.geneontology.org/formats/oboInOwl#inSubset')
     therapeutic_area_label = rdflib.term.Literal('therapeutic_area')
-    for therapeutic_area in rdf_graph.subjects((None,in_subset,therapeutic_area_label)):
+    for s in rdf_graph.subjects(in_subset,therapeutic_area_label):
+        therapeutic_area = str(s)
+        logger.debug("found therapeutic area: %s", therapeutic_area)
         yield therapeutic_area
-        
