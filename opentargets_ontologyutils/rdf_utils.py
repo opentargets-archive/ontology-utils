@@ -325,7 +325,7 @@ class DiseaseUtils(object):
         '''
         for rdisease_uri, rdisease_label, rphenotype_uri, rphenotype_label in qres:
             (disease_uri, disease_label, phenotype_uri, phenotype_label) = (str(rdisease_uri), str(rdisease_label), str(rphenotype_uri), str(rphenotype_label))
-            logger.debug("%s (%s) hasPhenotype %s (%s)" % (disease_uri, disease_label, phenotype_uri, phenotype_label))
+            #logger.debug("%s (%s) hasPhenotype %s (%s)" % (disease_uri, disease_label, phenotype_uri, phenotype_label))
             if disease_uri not in disease_phenotypes_map:
                 disease_phenotypes_map[disease_uri] = { 'label': disease_label, 'phenotypes': [] }
             if phenotype_uri not in [x['uri'] for x in disease_phenotypes_map[disease_uri]['phenotypes']]:

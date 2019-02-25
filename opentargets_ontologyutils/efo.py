@@ -30,9 +30,13 @@ def load_open_targets_disease_ontology(ocr, efo_uri):
             'http://www.ifomis.org/bfo/1.1/snap#Function']:
 
         ocr.load_ontology_classes(base_class=root)
+    logger.debug("Found %d classes", len(ocr.current_classes.key()))
+
+
+    therapeutic_areas = tuple(find_therapeutic_areas(ocr.rdf_graph))
+    logger.debug("Found therapeutic areas: %s", therapeutic_areas)
 
     #for each therapeutic area, calculate the paths and parents
-    therapeutic_areas = tuple(find_therapeutic_areas(ocr.rdf_graph))
     ocr.classes_paths_bases = {}
     for therapeutic_area in therapeutic_areas:
         ocr.classes_paths_bases[therapeutic_area] = ocr.get_classes_paths(root_uri=therapeutic_area, level=0)
@@ -50,7 +54,7 @@ def load_open_targets_disease_ontology(ocr, efo_uri):
         for uri in ocr.classes_paths_bases[therapeutic_area]:
             ocr.therapeutic_labels[uri].append(label)
 
-    
+
 
 
 """
