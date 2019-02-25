@@ -59,6 +59,6 @@ Generator of the therapeutic areas labelled in the rdf graph of efo
 def find_therapeutic_areas(rdf_graph):
     in_subset = rdflib.term.URIRef('http://www.geneontology.org/formats/oboInOwl#inSubset')
     therapeutic_area_label = rdflib.term.Literal('therapeutic_area')
-    for therapeutic_area in rdf_graph.subject((None,in_subset,therapeutic_area_label)):
+    for therapeutic_area in rdf_graph.subjects((None,in_subset,therapeutic_area_label)):
         yield therapeutic_area
         
