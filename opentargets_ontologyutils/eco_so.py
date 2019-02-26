@@ -4,7 +4,7 @@ import logging
 
 import rdflib
 
-from opentargets_ontologyutils.rdf_utils import OntologyClassReader
+from opentargets_ontologyutils.rdf_utils import OntologyClassReader,merge_classes_paths
 
 logger = logging.getLogger(__name__)
 
@@ -71,10 +71,16 @@ def load_evidence_classes(ocr, uri_so, uri_eco):
     # ClinVAR SNP-gene pipeline http://identifiers.org/eco/clinvar_gene_assignments SubclassOf ECO:0000246
     # CTTV-custom annotation pipeline http://identifiers.org/eco/cttv_mapping_pipeline SubclassOf ECO:0000246
 
-    for base_class in ['http://purl.obolibrary.org/obo/ECO_0000000', 
+    base_classes = ['http://purl.obolibrary.org/obo/ECO_0000000', 
         'http://purl.obolibrary.org/obo/SO_0000400', 
         'http://purl.obolibrary.org/obo/SO_0001260', 
         'http://purl.obolibrary.org/obo/SO_0000110', 
-        'http://purl.obolibrary.org/obo/SO_0001060' ]:
+        'http://purl.obolibrary.org/obo/SO_0001060' ]
+
+    #for each base class, calculate the paths and parents
+    #combine each base class in a combined collection
+    ocr.classes_paths = {}
+    for base_class in base_classes:
         ocr.load_ontology_classes(base_class=base_class)
-        ocr.classes_paths = ocr.get_classes_paths(root_uri=base_class, level=0)
+        classes_paths = ocr.get_classes_paths(root_uri=base_class, level=0)
+        ocr.classes_paths = merge_classes_paths(ocr.classes_paths, classes_paths)
