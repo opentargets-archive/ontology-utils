@@ -51,7 +51,6 @@ def get_hpo(ocr, uri):
     base_class = 'http://purl.obolibrary.org/obo/HP_0000118'
     ocr.load_ontology_classes(base_class=base_class)
     ocr.get_deprecated_classes()
-    ocr.get_top_levels(base_class= base_class)
 
     ocr.rdf_graph = None
     return ocr

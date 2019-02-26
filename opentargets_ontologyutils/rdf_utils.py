@@ -127,7 +127,7 @@ class OntologyClassReader(object):
                                        'reason_for_obsolescence': reason_for_obsolescence,
                                        'processed': False}
                 count +=1
-                logger.debug("WARNING: Obsolete %s %s '%s' %s" % (uri, label, reason_for_obsolescence, new_uri))
+                logger.debug("Obsoleted %s %s '%s' use %s" % (uri, label, reason_for_obsolescence, new_uri))
 
         """
         Still need to loop over to find the next new class to replace the
@@ -146,7 +146,6 @@ class OntologyClassReader(object):
                     next_reason = self.obsoletes[prev_uri]['reason_for_obsolescence']
                 if next_uri in self.current_classes:
                     new_label = self.current_classes[next_uri]
-                    #logger.warn("%s => %s" % (old_uri, self.obsoletes[old_uri]))
                     self.obsolete_classes[old_uri] = "Use %s label:%s (reason: %s)" % (next_uri, new_label, next_reason)
                 else:
                     # load the class
@@ -197,22 +196,6 @@ class OntologyClassReader(object):
 
         logger.debug("parsed %i classes"%count)
 
-    def get_top_levels(self, base_class=None):
-
-        sparql_query = '''
-        select DISTINCT ?top_level ?top_level_label
-        {
-          ?top_level rdfs:subClassOf <%s> .
-          ?top_level rdfs:label ?top_level_label
-        }
-        '''
-        qres = self.rdf_graph.query(sparql_query % base_class)
-
-        for row in qres:
-            uri = str(row[0])
-            label = str(row[1])
-            self.top_level_classes[uri] = label
-
     def get_children(self, uri):
 
         disease_uri = URIRef(uri)
@@ -230,11 +213,14 @@ class OntologyClassReader(object):
         while next_uri in list(self.obsoletes.keys()):
             next_uri = self.obsoletes[next_uri]['new_uri']
         if next_uri in self.current_classes:
-            #logger.warn("%s => %s" % (old_uri, self.obsoletes[old_uri]))
             return next_uri
         else:
             return None
 
+    """
+    retuns a dictionary where keys are iris that are subclasses of the root uri
+    and the value is a dictionary 
+    """
     def get_classes_paths(self, root_uri, level=0):
 
         root_node = rdflib.resource.Resource(self.rdf_graph,
@@ -242,11 +228,13 @@ class OntologyClassReader(object):
 
         # create an entry for the root:
         root_node_uri = str(root_node.identifier)
-        self.classes_paths[root_node_uri] = {'all': [], 'labels': [], 'ids': []}
-        self.classes_paths[root_node_uri]['all'].append([{'uri': str(root_node_uri), 'label': root_node.value(RDFS.label)}])
-        self.classes_paths[root_node_uri]['labels'].append([root_node.value(RDFS.label)])
+
+        classes_paths = {}
+        classes_paths[root_node_uri] = {'all': [], 'labels': [], 'ids': []}
+        classes_paths[root_node_uri]['all'].append([{'uri': str(root_node_uri), 'label': root_node.value(RDFS.label)}])
+        classes_paths[root_node_uri]['labels'].append([root_node.value(RDFS.label)])
         (prefix, namespace, id) = self.rdf_graph.namespace_manager.compute_qname(root_node.identifier)
-        self.classes_paths[root_node_uri]['ids'].append([id])
+        classes_paths[root_node_uri]['ids'].append([id])
 
         for entity in self.rdf_graph.transitiveClosure(_get_subclass_of, (root_node, 0, (), level)):
 
@@ -256,8 +244,8 @@ class OntologyClassReader(object):
 
             node_uri = str(node.identifier)
 
-            if node_uri not in self.classes_paths:
-                self.classes_paths[node_uri] = { 'all': [], 'labels': [], 'ids': [] }
+            if node_uri not in classes_paths:
+                classes_paths[node_uri] = { 'all': [], 'labels': [], 'ids': [] }
 
             all_struct = []
             labels_struct = []
@@ -274,11 +262,11 @@ class OntologyClassReader(object):
             (prefix, namespace, id) = self.rdf_graph.namespace_manager.compute_qname(node.identifier)
             ids_struct.append( id )
 
-            self.classes_paths[node_uri]['all'].append(all_struct)
-            self.classes_paths[node_uri]['labels'].append(labels_struct)
-            self.classes_paths[node_uri]['ids'].append(ids_struct)
+            classes_paths[node_uri]['all'].append(all_struct)
+            classes_paths[node_uri]['labels'].append(labels_struct)
+            classes_paths[node_uri]['ids'].append(ids_struct)
 
-        return
+        return classes_paths
 
     def parse_properties(self, rdf_node):
         #logger.debug("parse_properties for rdf_node: {}".format(rdf_node))
@@ -294,6 +282,8 @@ class OntologyClassReader(object):
             else:
                 rdf_properties[property_name] = [property_value]
         return rdf_properties
+
+
 
 
 class DiseaseUtils(object):
@@ -335,10 +325,22 @@ class DiseaseUtils(object):
         '''
         for rdisease_uri, rdisease_label, rphenotype_uri, rphenotype_label in qres:
             (disease_uri, disease_label, phenotype_uri, phenotype_label) = (str(rdisease_uri), str(rdisease_label), str(rphenotype_uri), str(rphenotype_label))
-            logger.debug("%s (%s) hasPhenotype %s (%s)" % (disease_uri, disease_label, phenotype_uri, phenotype_label))
+            #logger.debug("%s (%s) hasPhenotype %s (%s)" % (disease_uri, disease_label, phenotype_uri, phenotype_label))
             if disease_uri not in disease_phenotypes_map:
                 disease_phenotypes_map[disease_uri] = { 'label': disease_label, 'phenotypes': [] }
             if phenotype_uri not in [x['uri'] for x in disease_phenotypes_map[disease_uri]['phenotypes']]:
                 disease_phenotypes_map[disease_uri]['phenotypes'].append({'label': phenotype_label, 'uri': phenotype_uri})
 
         return disease_phenotypes_map
+
+
+def merge_classes_paths(a,b):
+    result = {}
+    for src in a,b:
+        for uri in src:
+            if uri not in result:
+                result[uri] = {'all': [], 'labels': [], 'ids': []}
+            result[uri]['all'].extend(src[uri]['all'])
+            result[uri]['labels'].extend(src[uri]['labels'])
+            result[uri]['ids'].extend(src[uri]['ids'])
+    return result
