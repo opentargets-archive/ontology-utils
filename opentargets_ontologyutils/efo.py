@@ -41,12 +41,12 @@ def load_open_targets_disease_ontology(ocr, efo_uri):
     logger.debug("Found %d therapeutic areas", len(therapeutic_areas))
 
     #combine a dictionary of which therapeutic areas each term is in
-    ocr.therapeutic_labels = collections.defaultdict(list)
+    ocr.therapeutic_labels = collections.defaultdict(set)
     for uri in ocr.classes_paths:
         for path in ocr.classes_paths[uri]['all']:
             for entry in path:
                 if entry['uri'] in therapeutic_areas:
-                    ocr.therapeutic_labels[uri].append(entry['label'])
+                    ocr.therapeutic_labels[uri].add(str(entry['label']))
 
 
 """
