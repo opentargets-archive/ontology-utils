@@ -42,17 +42,20 @@ def load_open_targets_disease_ontology(ocr, efo_uri):
 
     #combine a dictionary of which therapeutic areas each term is in
     ocr.therapeutic_labels = collections.defaultdict(set)
+    ocr.therapeutic_uris = collections.defaultdict(set)
     for uri in ocr.classes_paths:
         #check if this uri is a therapeutic area itself
         if uri in therapeutic_areas:
             label = ocr.current_classes[uri]
             ocr.therapeutic_labels[uri].add(label)
+            ocr.therapeutic_uris[uri].add(uri)
         #follow all paths to root and check if therapeutic area
         for path in ocr.classes_paths[uri]['all']:
             for entry in path:
                 if entry['uri'] in therapeutic_areas:
                     label = ocr.current_classes[entry['uri']]
                     ocr.therapeutic_labels[uri].add(label)
+                    ocr.therapeutic_uris[uri].add(entry['uri'])
 
 
 """
