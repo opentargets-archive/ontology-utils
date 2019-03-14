@@ -1,6 +1,10 @@
+import logging
+import os
 import opentargets_ontologyutils.efo as efo
 import opentargets_ontologyutils.rdf_utils as rdf_utils
 
+# Change logging level here.
+logging.basicConfig(level=os.environ.get('LOG_LEVEL', logging.DEBUG))
 
 def test_efo():
     ocr = rdf_utils.OntologyClassReader()
