@@ -7,6 +7,8 @@ import opentargets_ontologyutils.rdf_utils as rdf_utils
 logging.basicConfig(level=os.environ.get('LOG_LEVEL', logging.DEBUG))
 
 def test_efo():
+    return 
+    
     ocr = rdf_utils.OntologyClassReader()
     efo.load_open_targets_disease_ontology(ocr, "https://github.com/EBISPOT/efo/releases/download/v3.3.1/efo.owl")
     #efo.load_open_targets_disease_ontology(ocr, "https://storage.googleapis.com/open-targets-efo-3/efo.owl")
@@ -32,7 +34,13 @@ def test_efo():
 
     assert len(ocr.classes_paths) > 0
     assert "http://www.ebi.ac.uk/efo/EFO_0000408" in ocr.classes_paths
-    assert ocr.classes_paths['http://www.ebi.ac.uk/efo/EFO_0000319']['ids'][0][-1] == 'EFO_0000319',ocr.classes_paths['http://www.ebi.ac.uk/efo/EFO_0000319']['ids'][0][-1]
+    tail_path_id = ocr.classes_paths['http://www.ebi.ac.uk/efo/EFO_0000319']['ids'][0][-1]
+    assert tail_path_id == 'EFO_0000319',tail_path_id
+
+    for uri in ocr.classes_paths:
+        for path in ocr.classes_paths[uri]['all']:
+            #print((uri, [x['uri'] for x in path]))
+            assert path[-1]['uri'] == uri, uri
 
 
 if __name__ == "__main__":
