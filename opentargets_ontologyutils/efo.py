@@ -24,11 +24,11 @@ def load_open_targets_disease_ontology(ocr, efo_uri):
     # disease, phenotype, measurement, biological process, function
     #these are the parts of EFO that we want to slim to
     ocr.classes_paths = {}
-    for root in [ 'http://www.ebi.ac.uk/efo/EFO_0000408',
-            'http://www.ebi.ac.uk/efo/EFO_0000651',
-            'http://www.ebi.ac.uk/efo/EFO_0001444',
-            'http://purl.obolibrary.org/obo/GO_0008150',
-            'http://www.ifomis.org/bfo/1.1/snap#Function']:
+    for root in [ 'http://www.ebi.ac.uk/efo/EFO_0000408', #disease
+            'http://www.ebi.ac.uk/efo/EFO_0000651', #phenotype
+            'http://www.ebi.ac.uk/efo/EFO_0001444', #measurement
+            'http://purl.obolibrary.org/obo/GO_0008150', #biological_process
+            'http://www.ifomis.org/bfo/1.1/snap#Function']: #function
 
         ocr.load_ontology_classes(base_class=root)
         classes_paths = ocr.get_classes_paths(root_uri=root, level=0)
