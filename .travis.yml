@@ -10,6 +10,7 @@ script:
   - pytest --cov=opentargets_ontologyutils --cov-report term tests/ --fulltrace
 deploy:
   provider: pypi
+  skip_existing: true
   user: "${PYPI_USERNAME}"
   password: "${PYPI_PASSWORD}"
   on:
