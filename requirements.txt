@@ -1,5 +1,4 @@
 #make sure this matches setup.py install_requires
-
-requests-file
+opentargets-urlzsource==1.0.0
 rdflib
 future

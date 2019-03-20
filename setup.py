@@ -30,7 +30,7 @@ setup(
     platforms=['any'],
     #make sure this matches requirements.txt
     install_requires=[
-        'requests-file','rdflib','future'
+        'opentargets-urlzsource==1.0.0','rdflib','future'
       ],
     include_package_data=True,
     entry_points={},
