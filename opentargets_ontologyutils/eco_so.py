@@ -54,8 +54,7 @@ def load_evidence_classes(ocr, uri_so, uri_eco):
         'http://www.targetvalidation.org/provenance/LiteratureProvenance':'literature provenance',
         'http://www.targetvalidation.org/provenance/disease_to_phenotype_association':'disease to phenotype association',
         'http://www.targetvalidation.org/provenance/gene_to_disease_association':'gene to disease association',
-        'http://identifiers.org/eco/locus_to_gene_pipeline':'Open Targets Genetics portal locus to gene annotation pipeline',
-        'http://identifiers.org/eco/PheWAS': 'PheWAS catalog evidence'
+        'http://identifiers.org/eco/locus_to_gene_pipeline':'Open Targets Genetics portal locus to gene annotation pipeline'
     }
 
     for uri, label in open_targets_terms.items():
